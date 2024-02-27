@@ -1,5 +1,4 @@
 import path from 'path';
-import fs from 'fs-extra';
 import winston from 'winston';
 
 export interface ILoggerConfig {
@@ -129,8 +128,6 @@ export class Logger {
         const file = `${new Date().toISOString().replace(/[:.]/g, '-')}.log`;
         const filepath = config.filePath ?? path.join(__dirname, 'logs');
 
-        console.log(`filename:`, path.join(filepath, file));
-
         return {
             level: config.level,
             filename: path.join(filepath, file),
@@ -225,7 +222,7 @@ export class Logger {
      * @param message The log message.
      * @param extra Optional extra data to include in the log entry.
      */
-    private async handle(level: string, message: string, extra?: any): Promise<void> {
+    private async handle(level: LogLevels, message: string, extra?: any): Promise<void> {
         this._logger.log(level, message, { metadata: extra });
     }
 
