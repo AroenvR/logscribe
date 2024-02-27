@@ -1,4 +1,5 @@
 import path from 'path';
+import fs from 'fs-extra';
 import winston from 'winston';
 
 export interface ILoggerConfig {
@@ -16,7 +17,7 @@ export type LogLevels = 'verbose' | 'debug' | 'info' | 'normal' | 'warn' | 'erro
  * Logger class to handle application logs.  
  * It provides various log levels and supports different transports (console, HTTP, and file).
  */
-export default class Logger {
+export class Logger {
     private static _instance: Logger;
     private _logger: winston.Logger;
 
@@ -125,9 +126,14 @@ export default class Logger {
      * @returns A winston.transports.FileTransportOptions instance.
      */
     private configureFileTransport(config: ILoggerConfig): winston.transports.FileTransportOptions {
+        const file = `${new Date().toISOString().replace(/[:.]/g, '-')}.log`;
+        const filepath = config.filePath ?? path.join(__dirname, 'logs');
+
+        console.log(`filename:`, path.join(filepath, file));
+
         return {
             level: config.level,
-            filename: config.filePath ?? path.join(__dirname, '../', '../logs', `${new Date().toISOString().replace(/[:.]/g, '-')}.log`),
+            filename: path.join(filepath, file),
             format: winston.format.printf(({ level, message, metadata }) => {
                 const now = new Date();
                 const timestamp = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}.${now.getMilliseconds().toString().padStart(3, '0')}`;
