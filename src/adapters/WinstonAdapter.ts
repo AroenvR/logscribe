@@ -3,13 +3,13 @@ import winston from 'winston';
 import { v4 as uuidv4 } from 'uuid';
 import { TMetadata } from '../ILogger';
 import { TLogLevels } from '../LoggerConfig';
-import { AbstractLogAdapter } from './AbstractLogAdapter';
+import { AbstractAdapter } from './AbstractAdapter';
 
 /**
  * The Adapter responsible for logging messages using the Winston library.
  * @extends LogAdapter The base class for all log adapters.
  */
-export class WinstonAdapter extends AbstractLogAdapter<winston.Logger> {
+export class WinstonAdapter extends AbstractAdapter<winston.Logger> {
     protected name = "WinstonAdapter";
 
     public verbose(message: string, metadata?: TMetadata): void {

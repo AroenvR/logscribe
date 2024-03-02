@@ -5,8 +5,8 @@ import { ILoggerConfig } from "../LoggerConfig";
 /**
  * The base class for all log adapters.  
  */
-export abstract class AbstractLogAdapter<T> implements ILogger {
-    protected name = "AbstractLogAdapter";
+export abstract class AbstractAdapter<T> implements ILogger {
+    protected name = "AbstractAdapter";
     protected logger: T;
     protected config: ILoggerConfig;
 
@@ -25,7 +25,6 @@ export abstract class AbstractLogAdapter<T> implements ILogger {
         this.overwriteConsole();
 
         this.logger = this.create();
-        this.critical(`${this.name} initialized. Config:`, this.config);
     }
 
     public abstract verbose(message: string, metadata?: TMetadata): void;
@@ -56,23 +55,23 @@ export abstract class AbstractLogAdapter<T> implements ILogger {
         }
         else {
             console.debug = (...args: any[]) => {
-                this.verbose(`console.debug ${args[0]} `, args[1]);
+                this.verbose(`console.debug ${args[0]}`, args[1]);
             }
 
             console.log = (...args: any[]) => {
-                this.verbose(`console.log ${args[0]} `, args[1]);
+                this.verbose(`console.log ${args[0]}`, args[1]);
             }
 
             console.info = (...args: any[]) => {
-                this.verbose(`console.info ${args[0]} `, args[1]);
+                this.verbose(`console.info ${args[0]}`, args[1]);
             }
 
             console.warn = (...args: any[]) => {
-                this.verbose(`console.warn ${args[0]} `, args[1]);
+                this.verbose(`console.warn ${args[0]}`, args[1]);
             }
 
             console.error = (...args: any[]) => {
-                this.verbose(`console.error ${args[0]} `, args[1]);
+                this.verbose(`console.error ${args[0]}`, args[1]);
             }
         }
     }

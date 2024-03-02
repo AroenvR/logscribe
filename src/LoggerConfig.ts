@@ -1,12 +1,12 @@
 import { LoggerFactory } from "./LoggerFactory";
-import { AbstractLogAdapter } from "./adapters/AbstractLogAdapter";
+import { AbstractAdapter } from "./adapters/AbstractAdapter";
 
 /**
  * The drivers supported by the application for logging.
  * @devnote When adding a new driver, ensure to do the following:  
  * 1. Add the driver to the {@link TLogDrivers} type.  
  * 2. Add the driver to the {@link LoggerFactory.createInstance} method.
- * 3. Create a new {@link AbstractLogAdapter} for the driver.
+ * 3. Create a new {@link AbstractAdapter} for the driver.
  */
 type TLogDrivers = 'winston';
 
