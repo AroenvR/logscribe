@@ -1,9 +1,9 @@
 import path from "path";
 import { ILoggerConfig, LoggerConfigurator } from "../LoggerConfigurator";
-import { defaultConfig } from "./defaultConfig";
+import { fallbackConfig } from "./testingConfigs";
 
 describe('LoggerConfig', () => {
-    const loadedConfig = {
+    const loadedConfig: ILoggerConfig = {
         appName: 'JestTest',
         driver: 'winston',
         level: 'verbose',
@@ -18,11 +18,11 @@ describe('LoggerConfig', () => {
 
     // ------------------------------
 
-    it('Should return default configuration when nothing is given', () => {
+    it('Should return a fallback configuration when nothing is given', () => {
         const configurator = new LoggerConfigurator();
         const config = configurator.loadConfiguration();
 
-        expect(config).toEqual(defaultConfig);
+        expect(config).toEqual(fallbackConfig);
     });
 
     // ------------------------------
@@ -61,6 +61,17 @@ describe('LoggerConfig', () => {
             }
         }
         const configurator = new LoggerConfigurator({ loader: "object", config: defaultConfig });
+        const config = configurator.loadConfiguration();
+
+        expect(config).toEqual(loadedConfig);
+    });
+
+    // ------------------------------
+
+    it('Environment variable configuration overrides a given configuration', () => {
+        process.env.LOGSCRIBE_CONFIG = path.join(__dirname, 'loggerConfig.json');
+
+        const configurator = new LoggerConfigurator({ loader: "object", config: fallbackConfig });
         const config = configurator.loadConfiguration();
 
         expect(config).toEqual(loadedConfig);

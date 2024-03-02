@@ -1,9 +1,57 @@
+import path from 'path';
+import { ILogger } from '../ILogger';
 import { LoggerFactory } from '../LoggerFactory';
-import { defaultConfig } from './defaultConfig';
+import { defaultConfig, fallbackConfig } from './testingConfigs';
+import { TLoggerOptions } from '../LoggerConfigurator';
 
 describe('LoggerFactory', () => {
+    let logger: ILogger;
 
-    it('should return a singleton logger instance', () => {
+    afterEach(() => {
+        jest.restoreAllMocks();
+        jest.resetAllMocks();
+    });
+
+    // ------------------------------
+
+    it("Gets a logger with default configuration if no settings are found", () => {
+        logger = LoggerFactory.getLogger();
+
+        expect(logger).toBeDefined();
+        expect(logger.config).toEqual(fallbackConfig);
+    });
+
+    // ------------------------------
+
+    it('Creates a logger with the given configuration environment variable', () => {
+        process.env.LOGSCRIBE_CONFIG = path.join(__dirname, 'loggerConfig.json');
+        logger = LoggerFactory.initialize();
+
+        expect(logger.config).toEqual(defaultConfig);
+    });
+
+    // ------------------------------
+
+    it('Creates a logger with the given configuration file path', () => {
+        const configPath = path.join(__dirname, 'loggerConfig.json');
+        const config: TLoggerOptions = { loader: "file", path: configPath }
+        logger = LoggerFactory.initialize(config);
+
+        expect(logger.config).toEqual(defaultConfig);
+    });
+
+    // ------------------------------
+
+    it('Creates a logger with the given configuration object', () => {
+        let config: TLoggerOptions = { loader: "object", config: defaultConfig }
+        logger = LoggerFactory.initialize(config);
+
+        expect(logger.config).toEqual(defaultConfig);
+    });
+
+    // ------------------------------
+
+    it('Returns a singleton logger instance', () => {
         const loggerOne = LoggerFactory.getLogger();
         const loggerTwo = LoggerFactory.getLogger();
 
@@ -12,23 +60,5 @@ describe('LoggerFactory', () => {
         expect(loggerOne).toBe(loggerTwo);
     });
 
-    // ------------------------------
-
-    it('should create a logger with default configuration if no environment-specific settings are found', () => {
-        const logger = LoggerFactory.getLogger();
-        expect(logger.config).toEqual(defaultConfig);
-    });
-
-    // ------------------------------
-
-    // This test assumes the existence of a method or property to verify the logger's configuration.
-    // Adjust according to your ILogger interface and logger implementation details.
-    it('should create a logger with the correct configuration', () => {
-        const logger = LoggerFactory.getLogger();
-        // Assuming logger exposes a way to check its configuration; adjust as necessary.
-        // const config = logger.getConfig(); // This method or equivalent is hypothetical.
-        // expect(config.level).toBeDefined();
-        // expect(config.transports).toContain('console');
-    });
 });
 

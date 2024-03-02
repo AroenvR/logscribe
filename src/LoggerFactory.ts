@@ -1,5 +1,5 @@
 import { ILogger } from './ILogger';
-import { ILoggerConfig, LoggerConfigurator } from './LoggerConfigurator';
+import { ILoggerConfig, LoggerConfigurator, TLoggerOptions } from './LoggerConfigurator';
 import { WinstonAdapter } from './adapters/WinstonAdapter';
 
 /**
@@ -15,13 +15,23 @@ export class LoggerFactory {
      */
     public static getLogger(): ILogger {
         if (!LoggerFactory.instance) {
-            const configurator = new LoggerConfigurator();
-            const config = configurator.loadConfiguration();
-
-            this.instance = this.createInstance(config);
+            this.instance = this.initialize();
         }
 
         return LoggerFactory.instance;
+    }
+
+    /**
+     * Initializes the logger instance based on the provided configuration settings.
+     * @param opts The configuration settings for the logger.
+     * @returns {ILogger} A logger instance.
+     */
+    public static initialize(opts?: TLoggerOptions): ILogger {
+        const configurator = new LoggerConfigurator(opts);
+        const configuration = configurator.loadConfiguration();
+
+        this.instance = this.createAdapter(configuration);
+        return this.instance;
     }
 
     /**
@@ -29,7 +39,7 @@ export class LoggerFactory {
      * @param config The configuration settings for the logger.
      * @returns {ILogger} A logger instance.
      */
-    private static createInstance(config: ILoggerConfig): ILogger {
+    private static createAdapter(config: ILoggerConfig): ILogger {
         switch (config.driver) {
             case 'winston':
                 return new WinstonAdapter(config);

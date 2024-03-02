@@ -74,7 +74,7 @@ export interface ILoggerConfig {
  * If the loader is set to 'file', the path property is required.  
  * If the loader is set to 'object', the config property is required.  
  */
-type TLoggerOptions = {
+export type TLoggerOptions = {
   loader: 'file';
   path: string;
 } | {
@@ -97,10 +97,14 @@ export class LoggerConfigurator {
   /**
    * Loads the configuration settings.
    * @returns The configuration settings for the logger.
+   * @devnote  
+   * Will check the environment variable LOGSCRIBE_CONFIG for a configuration file first.  
+   * If the environment variable is not set, it will load the configuration based on the provided options.  
+   * If no options are provided, it will return the default configuration.
    */
   public loadConfiguration(): ILoggerConfig {
-    // Set the default configuration.
-    const defaultConfig: ILoggerConfig = {
+    // Set the fallback configuration.
+    const fallbackConfig: ILoggerConfig = {
       appName: 'UNKNOWN-SET_TO_DEFAULT_CONFIG',
       driver: 'winston',
       level: 'critical',
@@ -113,15 +117,15 @@ export class LoggerConfigurator {
       }
     };
 
+    // If the environment variable LOGSCRIBE_CONFIG is set, load the configuration from the specified file.
+    if (process.env.LOGSCRIBE_CONFIG) {
+      this._config = JSON.parse(fs.readFileSync(process.env.LOGSCRIBE_CONFIG, 'utf8'));
+      return this.config;
+    }
+
     // If no options are provided, return the default configuration.
     if (!this.opts || !this.opts.loader) {
-      this.config = defaultConfig;
-
-      // If the environment variable LOGSCRIBE_CONFIG is set, load the configuration from the specified file.
-      if (process.env.LOGSCRIBE_CONFIG) {
-        this._config = JSON.parse(fs.readFileSync(process.env.LOGSCRIBE_CONFIG, 'utf8'));
-      }
-
+      this.config = fallbackConfig;
       return this.config;
     }
 
@@ -136,7 +140,7 @@ export class LoggerConfigurator {
         break;
 
       default:
-        this.config = defaultConfig;
+        this.config = fallbackConfig;
         break;
     }
 
