@@ -30,8 +30,8 @@ export interface ILoggerConfig {
   console: boolean;
   file: boolean;
   filePath?: string;
-  // http: boolean;
-  // httpConfig?: ILoggerHTTPConfig; // To properly implement, remove the question mark and get started.
+  http: boolean;
+  httpConfig?: ILoggerHTTPConfig; // To properly implement, remove the question mark and get started.
 }
 
 /**
@@ -46,13 +46,12 @@ export class LoggerConfig {
    */
   static loadConfiguration(): ILoggerConfig {
     const defaultConfig: ILoggerConfig = {
-      appName: 'app',
+      appName: 'UNKNOWN-SET_TO_DEFAULT_CONFIG',
       driver: 'winston',
-      level: 'info',
+      level: 'critical',
       console: false,
-      file: true,
-      filePath: './logs',
-      // http: false,
+      file: false,
+      http: false,
     };
 
     return defaultConfig;

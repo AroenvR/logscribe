@@ -1,5 +1,6 @@
 import path from 'path';
 import winston from 'winston';
+import { v4 as uuidv4 } from 'uuid';
 import { ILogger, TMetadata } from '../ILogger';
 import { ILoggerConfig, TLogLevels } from '../LoggerConfig';
 
@@ -11,12 +12,12 @@ abstract class LogAdapter implements ILogger {
         this.config = config;
         this.logger = this.createLogger(config);
 
-        // if (config.level === "verbose") {
-        //     this.overwriteConsole();
-        // }
-        // else {
-        //     this.noConsole();
-        // }
+        if (config.level === "verbose") {
+            this.overwriteConsole();
+        }
+        else {
+            this.noConsole();
+        }
     }
 
     public abstract verbose(message: string, metadata?: TMetadata): void;
@@ -36,38 +37,38 @@ abstract class LogAdapter implements ILogger {
     /**
      * Overwrites the console methods to log to the application's logger instead.
      */
-    // private overwriteConsole(): void {
-    //     console.debug = (...args: any[]) => {
-    //         this.verbose(`console.debug ${args[0]} `, args[1]);
-    //     }
+    private overwriteConsole(): void {
+        console.debug = (...args: any[]) => {
+            this.verbose(`console.debug ${args[0]} `, args[1]);
+        }
 
-    //     console.log = (...args: any[]) => {
-    //         this.verbose(`console.log ${args[0]} `, args[1]);
-    //     }
+        console.log = (...args: any[]) => {
+            this.verbose(`console.log ${args[0]} `, args[1]);
+        }
 
-    //     console.info = (...args: any[]) => {
-    //         this.verbose(`console.info ${args[0]} `, args[1]);
-    //     }
+        console.info = (...args: any[]) => {
+            this.verbose(`console.info ${args[0]} `, args[1]);
+        }
 
-    //     console.warn = (...args: any[]) => {
-    //         this.verbose(`console.warn ${args[0]} `, args[1]);
-    //     }
+        console.warn = (...args: any[]) => {
+            this.verbose(`console.warn ${args[0]} `, args[1]);
+        }
 
-    //     console.error = (...args: any[]) => {
-    //         this.verbose(`console.error ${args[0]} `, args[1]);
-    //     }
-    // }
+        console.error = (...args: any[]) => {
+            this.verbose(`console.error ${args[0]} `, args[1]);
+        }
+    }
 
     /**
      * Overwrites the console methods to do nothing.
      */
-    // private noConsole(): void {
-    //     console.debug = () => { };
-    //     console.log = () => { };
-    //     console.info = () => { };
-    //     console.warn = () => { };
-    //     console.error = () => { };
-    // }
+    private noConsole(): void {
+        console.debug = () => { };
+        console.log = () => { };
+        console.info = () => { };
+        console.warn = () => { };
+        console.error = () => { };
+    }
 }
 
 /**
@@ -80,6 +81,8 @@ export class WinstonAdapter implements ILogger {
     constructor(config: ILoggerConfig) {
         this.config = config;
         this.logger = this.createLogger(config);
+
+        this.critical("Logger initialized. Config:", config);
     }
 
     public verbose(message: string, metadata?: TMetadata): void {
@@ -172,9 +175,9 @@ export class WinstonAdapter implements ILogger {
             transports.push(new winston.transports.File(this.configureFileTransport(config)));
         }
 
-        // if (config.http) {
-        //     transports.push(new winston.transports.Http(this.configureHttpTransport(config)));
-        // }
+        if (config.http) {
+            transports.push(new winston.transports.Http(this.configureHttpTransport(config)));
+        }
 
         const logger = winston.createLogger({
             levels: customLevels,
@@ -182,12 +185,12 @@ export class WinstonAdapter implements ILogger {
         });
 
         // Overwrite console methods for logging
-        // if (config.level === "verbose") {
-        //     this.overwriteConsole();
-        // }
-        // else {
-        //     this.noConsole();
-        // }
+        if (config.level === "verbose") {
+            this.overwriteConsole();
+        }
+        else {
+            this.noConsole();
+        }
 
         return logger;
     }
@@ -238,70 +241,70 @@ export class WinstonAdapter implements ILogger {
      * @param config - ILoggerConfig object containing the logger configuration.
      * @returns A winston.transports.HttpTransportOptions instance.
      */
-    // private configureHttpTransport(config: ILoggerConfig): winston.transports.HttpTransportOptions {
-    //     return {
-    //         level: config.level === "debug" ? "info" : config.level,
-    //         silent: config.http,
-    //         host: 'localhost',
-    //         path: '/logs',
-    //         ssl: true,
-    //         auth: {
-    //             bearer: process.env.BEARER_TOKEN
-    //         },
-    //         format: winston.format.printf(({ level, message, metadata }) => {
-    //             if (level === 'normal') level = "log";
+    private configureHttpTransport(config: ILoggerConfig): winston.transports.HttpTransportOptions {
+        return {
+            level: config.level === "debug" ? "info" : config.level,
+            silent: config.http,
+            host: 'localhost',
+            path: `/${uuidv4()}`,
+            ssl: true,
+            auth: {
+                bearer: process.env.BEARER_TOKEN
+            },
+            format: winston.format.printf(({ level, message, metadata }) => {
+                if (level === 'normal') level = "log";
 
-    //             const payload = {
-    //                 level: level.toUpperCase(),
-    //                 appName: this.config.appName,
-    //                 timestamp: new Date().getTime(),
-    //                 message: message,
-    //                 metadata: metadata instanceof Error ? {
-    //                     error: true,
-    //                     name: metadata.name,
-    //                     message: metadata.message,
-    //                     stack: metadata.stack
-    //                 } : metadata,
-    //             };
+                const payload = {
+                    level: level.toUpperCase(),
+                    appName: this.config.appName,
+                    timestamp: new Date().getTime(),
+                    message: message,
+                    metadata: metadata instanceof Error ? {
+                        error: true,
+                        name: metadata.name,
+                        message: metadata.message,
+                        stack: metadata.stack
+                    } : metadata,
+                };
 
-    //             return JSON.stringify(payload);
-    //         }),
-    //     }
-    // }
+                return JSON.stringify(payload);
+            }),
+        }
+    }
 
     /**
      * Overwrites the console methods to log to the application's logger instead.
      */
-    // private overwriteConsole(): void {
-    //     console.debug = (...args: any[]) => {
-    //         this.verbose(`console.debug ${args[0]} `, args[1]);
-    //     }
+    private overwriteConsole(): void {
+        console.debug = (...args: any[]) => {
+            this.verbose(`console.debug ${args[0]} `, args[1]);
+        }
 
-    //     console.log = (...args: any[]) => {
-    //         this.verbose(`console.log ${args[0]} `, args[1]);
-    //     }
+        console.log = (...args: any[]) => {
+            this.verbose(`console.log ${args[0]} `, args[1]);
+        }
 
-    //     console.info = (...args: any[]) => {
-    //         this.verbose(`console.info ${args[0]} `, args[1]);
-    //     }
+        console.info = (...args: any[]) => {
+            this.verbose(`console.info ${args[0]} `, args[1]);
+        }
 
-    //     console.warn = (...args: any[]) => {
-    //         this.verbose(`console.warn ${args[0]} `, args[1]);
-    //     }
+        console.warn = (...args: any[]) => {
+            this.verbose(`console.warn ${args[0]} `, args[1]);
+        }
 
-    //     console.error = (...args: any[]) => {
-    //         this.verbose(`console.error ${args[0]} `, args[1]);
-    //     }
-    // }
+        console.error = (...args: any[]) => {
+            this.verbose(`console.error ${args[0]} `, args[1]);
+        }
+    }
 
     /**
      * Overwrites the console methods to do nothing.
      */
-    // private noConsole(): void {
-    //     console.debug = () => { };
-    //     console.log = () => { };
-    //     console.info = () => { };
-    //     console.warn = () => { };
-    //     console.error = () => { };
-    // }
+    private noConsole(): void {
+        console.debug = () => { };
+        console.log = () => { };
+        console.info = () => { };
+        console.warn = () => { };
+        console.error = () => { };
+    }
 }

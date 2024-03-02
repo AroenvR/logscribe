@@ -15,10 +15,12 @@
   "author": "AroenvR",
   "license": "MIT",
   "dependencies": {
+    "@types/uuid": "^9.0.8",
     "dotenv": "^16.0.3",
     "fs-extra": "^11.2.0",
     "ts-istruthy": "^1.0.2",
     "ts-node": "^10.9.1",
+    "uuid": "^9.0.1",
     "winston": "^3.11.0"
   },
   "devDependencies": {

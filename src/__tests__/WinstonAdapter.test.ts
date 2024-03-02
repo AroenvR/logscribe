@@ -9,7 +9,7 @@ describe('WinstonAdapter', () => {
         console: true,
         file: true,
         filePath: './logs',
-        // http: false,
+        http: false,
     }
 
     let adapter: WinstonAdapter;
