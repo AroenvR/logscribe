@@ -1,5 +1,5 @@
 import { ILogger } from "./ILogger";
-import { ILoggerConfig } from "./LoggerConfig";
+import { ILoggerConfig } from "./LoggerConfigurator";
 
 export class Logger implements ILogger {
     private readonly name = "Logger";

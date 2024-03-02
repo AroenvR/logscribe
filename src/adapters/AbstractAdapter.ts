@@ -1,6 +1,6 @@
 import path from "path";
 import { ILogger, TMetadata } from "../ILogger";
-import { ILoggerConfig } from "../LoggerConfig";
+import { ILoggerConfig } from "../LoggerConfigurator";
 
 /**
  * The base class for all log adapters.  
@@ -8,10 +8,10 @@ import { ILoggerConfig } from "../LoggerConfig";
 export abstract class AbstractAdapter<T> implements ILogger {
     protected name = "AbstractAdapter";
     protected logger: T;
-    protected config: ILoggerConfig;
+    private _config: ILoggerConfig;
 
     constructor(config: ILoggerConfig) {
-        this.config = config;
+        this._config = config;
 
         // If the environment variable TAIL_TESTING is set to 'true', the log file is written to the logs directory in the project root as tail.test.log.
         if (process.env.TAIL_TESTING === "true") {
@@ -74,5 +74,9 @@ export abstract class AbstractAdapter<T> implements ILogger {
                 this.verbose(`console.error ${args[0]}`, args[1]);
             }
         }
+    }
+
+    public get config(): ILoggerConfig {
+        return this._config;
     }
 }

@@ -1,3 +1,5 @@
+import { ILoggerConfig } from "./LoggerConfigurator";
+
 /**
  * Type definition for metadata that can be attached to log messages.  
  * Can be a simple key-value record or an Error object for logging exceptions.
@@ -7,8 +9,11 @@ export type TMetadata = Record<string, any> | Error | unknown;
 /**
  * ILogger interface defines the structure for logging mechanisms within the package.  
  * It provides methods for logging at various levels from detailed debug information to critical errors.
+ * @property config The configuration settings for the logger.
  */
 export interface ILogger {
+    config: ILoggerConfig;
+
     /**
      * Logs verbose messages, intended for detailed internal state logging.
      * Should be used for tracing module logs and understanding application flow.

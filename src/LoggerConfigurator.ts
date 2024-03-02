@@ -1,4 +1,4 @@
-import { LoggerFactory } from "./LoggerFactory";
+import fs from 'fs-extra';
 import { AbstractAdapter } from "./adapters/AbstractAdapter";
 
 /**
@@ -66,16 +66,40 @@ export interface ILoggerConfig {
 }
 
 /**
+ * The options for loading the logger configuration settings.  
+ * @property loader The loader to use for loading the configuration settings.  
+ * @property path The path to the configuration file.  
+ * @property config The configuration settings to load.
+ * @devnote  
+ * If the loader is set to 'file', the path property is required.  
+ * If the loader is set to 'object', the config property is required.  
+ */
+type TLoggerOptions = {
+  loader: 'file';
+  path: string;
+} | {
+  loader: 'object';
+  config: ILoggerConfig;
+}
+
+/**
  * Class responsible for loading and providing logger configuration settings.
  */
 export class LoggerConfigurator {
+  private readonly name = 'LoggerConfigurator';
+  private _opts: TLoggerOptions | null = null;
+  private _config: ILoggerConfig | null = null;
+
+  constructor(opts?: TLoggerOptions) {
+    if (opts) this._opts = opts;
+  }
 
   /**
-   * Loads the logging configuration from environment variables or configuration files.
-   * Falls back to default settings if specific configurations are not found.
-   * @returns An object containing logging configuration.
+   * Loads the configuration settings.
+   * @returns The configuration settings for the logger.
    */
-  static loadConfiguration(): ILoggerConfig {
+  public loadConfiguration(): ILoggerConfig {
+    // Set the default configuration.
     const defaultConfig: ILoggerConfig = {
       appName: 'UNKNOWN-SET_TO_DEFAULT_CONFIG',
       driver: 'winston',
@@ -89,6 +113,46 @@ export class LoggerConfigurator {
       }
     };
 
-    return defaultConfig;
+    // If no options are provided, return the default configuration.
+    if (!this.opts || !this.opts.loader) {
+      this.config = defaultConfig;
+
+      // If the environment variable LOGSCRIBE_CONFIG is set, load the configuration from the specified file.
+      if (process.env.LOGSCRIBE_CONFIG) {
+        this._config = JSON.parse(fs.readFileSync(process.env.LOGSCRIBE_CONFIG, 'utf8'));
+      }
+
+      return this.config;
+    }
+
+    // Load the configuration based on the provided options.
+    switch (this.opts.loader) {
+      case 'file':
+        this._config = JSON.parse(fs.readFileSync(this.opts.path, 'utf8'));
+        break;
+
+      case 'object':
+        this._config = this.opts.config;
+        break;
+
+      default:
+        this.config = defaultConfig;
+        break;
+    }
+
+    return this.config;
+  };
+
+  private get opts(): TLoggerOptions | null {
+    return this._opts;
+  }
+
+  private set config(config: ILoggerConfig) {
+    this._config = config;
+  }
+
+  private get config(): ILoggerConfig {
+    if (!this._config) throw new Error(`${this.name}: Configuration has not been loaded.`);
+    return this._config;
   }
 }

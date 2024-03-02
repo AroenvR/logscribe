@@ -50,8 +50,7 @@ We are initiating the development of a scalable logging module that leverages Wi
 - [x] ILogger interface has methods implemented for various logging levels and is easily extensible.
 - [x] LoggerConfig supports reading from environment variables and/or configuration files with fallback defaults.
 - [x] LoggerFactory creates and returns logger instances appropriately per the provided configuration.
-- [ ] WinstonAdapter ensures that any ILogger method call correctly interacts with the Winston logger.
-- [ ] WinstonLogger implements the ILogger interface and delegates log operations to Winston properly.
+- [x] WinstonAdapter ensures that any ILogger method call correctly interacts with the Winston logger.
 - [ ] LoggingMiddleware generates a trace ID for each request, ensures each log message includes this ID, and all logs are associated with the request lifecycle.
 - [ ] RequestContext maintains trace ID and any other request-related data across asynchronous calls and is accessible throughout the application.
 - [ ] LogMessageQueue handles log messages asynchronicity without blocking the main thread and retains log order with accurate timestamps.
@@ -77,23 +76,19 @@ Developers should ensure all components are developed with SOLID principles in m
  - Begin writing the tests for the Winston adapter (WinstonAdapter.test.ts), asserting that it correctly translates ILogger interface calls to Winston-specific API calls.
  - Implement the Winston adapter (WinstonAdapter.ts) based on those tests.
 
-4. Winston Logger Strategy:
- - Define tests for the WinstonLogger strategy (WinstonLogger.test.ts) that check if the log methods behave as expected when called.
- - Code the WinstonLogger class (WinstonLogger.ts) as per the test specifications.
-
-5. Logger Factory:
+4. Logger Factory:
  - Develop tests for the LoggerFactory (LoggerFactory.test.ts), verifying that it correctly instantiates the desired logger based on configuration.
  - Implement the LoggerFactory (LoggerFactory.ts).
 
-6. Request Context:
+5. Request Context:
  - Write tests that ensure the RequestContext (RequestContext.test.ts) can maintain and propagate trace IDs and other context data across async operations.
  - Implement the RequestContext class (RequestContext.ts).
 
-7. Logging Middleware:
+6. Logging Middleware:
  - Craft tests to ensure the LoggingMiddleware (LoggingMiddleware.test.ts) adds a trace ID to every request and that this ID permeates through all subsequent logging calls.
  - Implement the middleware (LoggingMiddleware.ts).
 
-8. Log Message Queue:
+7. Log Message Queue:
  - Develop tests (LogMessageQueue.test.ts) to make sure the message queue handles asynchronous logging without losing the sequence of log messages.
  - Build the LogMessageQueue module (LogMessageQueue.ts).
 

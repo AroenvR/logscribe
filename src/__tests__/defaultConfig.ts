@@ -1,14 +1,12 @@
-import { ILoggerConfig } from "../LoggerConfig";
-
-export const defaultConfig: ILoggerConfig = {
-    appName: 'JestTest',
+export const defaultConfig = {
+    appName: 'UNKNOWN-SET_TO_DEFAULT_CONFIG',
     driver: 'winston',
-    level: 'verbose',
-    console: true,
+    level: 'critical',
+    console: false,
     file: {
         enabled: false,
     },
     http: {
-        enabled: false
+        enabled: false,
     }
 }

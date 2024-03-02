@@ -1,6 +1,18 @@
-import { defaultConfig } from "./defaultConfig";
 import { WinstonAdapter } from '../adapters/WinstonAdapter';
-import { ILoggerConfig } from "../LoggerConfig";
+import { ILoggerConfig } from "../LoggerConfigurator";
+
+const defaultConfig: ILoggerConfig = {
+    appName: 'JestTest',
+    driver: 'winston',
+    level: 'verbose',
+    console: true,
+    file: {
+        enabled: false,
+    },
+    http: {
+        enabled: false
+    }
+}
 
 describe('WinstonAdapter', () => {
     const adapter = new WinstonAdapter(defaultConfig);

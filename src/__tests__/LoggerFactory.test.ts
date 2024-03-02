@@ -1,4 +1,5 @@
 import { LoggerFactory } from '../LoggerFactory';
+import { defaultConfig } from './defaultConfig';
 
 describe('LoggerFactory', () => {
 
@@ -14,14 +15,8 @@ describe('LoggerFactory', () => {
     // ------------------------------
 
     it('should create a logger with default configuration if no environment-specific settings are found', () => {
-        // Assuming LoggerConfig can load a default configuration in the absence of environment-specific settings
         const logger = LoggerFactory.getLogger();
-
-        // Here you would check for some default properties of the logger.
-        // This might depend on your logger's implementation details, such as checking the log level or the transports.
-        // For example: expect(logger.getLevel()).toBe('info');
-        // Since we haven't implemented the actual loggers yet, we'll skip the detailed assertions for now.
-        expect(logger).toBeDefined();
+        expect(logger.config).toEqual(defaultConfig);
     });
 
     // ------------------------------

@@ -1,4 +1,4 @@
-import { ILoggerConfig } from "../LoggerConfig";
+import { ILoggerConfig } from "../LoggerConfigurator";
 import { ILogger } from "../ILogger";
 import { Logger } from "../Logger";
 

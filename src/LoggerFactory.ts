@@ -1,6 +1,6 @@
 import { ILogger } from './ILogger';
-import { WinstonLogger } from './strategies/WinstonLogger';
-import { ILoggerConfig, LoggerConfigurator } from './LoggerConfig';
+import { ILoggerConfig, LoggerConfigurator } from './LoggerConfigurator';
+import { WinstonAdapter } from './adapters/WinstonAdapter';
 
 /**
  * Factory class for creating logger instances.
@@ -15,7 +15,9 @@ export class LoggerFactory {
      */
     public static getLogger(): ILogger {
         if (!LoggerFactory.instance) {
-            const config = LoggerConfigurator.loadConfiguration();
+            const configurator = new LoggerConfigurator();
+            const config = configurator.loadConfiguration();
+
             this.instance = this.createInstance(config);
         }
 
@@ -30,7 +32,7 @@ export class LoggerFactory {
     private static createInstance(config: ILoggerConfig): ILogger {
         switch (config.driver) {
             case 'winston':
-                return new WinstonLogger(config);
+                return new WinstonAdapter(config);
 
             default:
                 throw new Error(`LoggerFactory: Unsupported logger driver: ${config.driver}`);
