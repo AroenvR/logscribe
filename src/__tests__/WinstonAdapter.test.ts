@@ -6,7 +6,7 @@ describe('WinstonAdapter', () => {
     const config: ILoggerConfig = {
         appName: 'JestTest',
         driver: 'winston',
-        level: 'verbose',
+        level: 'debug',
         console: true,
         file: {
             enabled: true,

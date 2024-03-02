@@ -95,14 +95,17 @@ export class WinstonAdapter extends AbstractLogAdapter<winston.Logger> {
             format: winston.format.printf(({ level, message, metadata }) => {
                 if (level === 'normal') level = "log"; // winston uses 'log' for the 'normal' level
 
-                let dataStr = "";
+                let extra = "";
                 if (metadata instanceof Error) {
-                    dataStr = `\n  Error Name: ${metadata.name}\n  Error Message: ${metadata.message}\n  Stack Trace:\n${metadata.stack?.split('\n').map(line => '  ' + line).join('\n')}`;
-                } else {
-                    dataStr = metadata ? "\n" + JSON.stringify(metadata, null, 4) : "";
-                }
+                    extra = `${metadata.name}: ${metadata.message}`;
 
-                return `${this.config.appName} ${level.toUpperCase()} - ${message} ${dataStr}`;
+                    if (this.config.level === "verbose" || this.config.level === "debug") {
+                        if (metadata.stack) extra = metadata.stack.split('\n').map(line => line).join('\n');
+                    }
+                }
+                else extra = metadata ? JSON.stringify(metadata, null, 4) : "";
+
+                return `${this.config.appName} ${level.toUpperCase()} - ${message} ${extra}`;
             }),
         };
     }
@@ -124,19 +127,19 @@ export class WinstonAdapter extends AbstractLogAdapter<winston.Logger> {
             format: winston.format.printf(({ level, message, metadata }) => {
                 if (level === 'normal') level = "log"; // winston uses 'log' for the 'normal' level
 
+                let extra = "";
                 if (metadata instanceof Error) {
-                    if (this.config.level === "verbose" || this.config.level === "debug") {
-                        if (metadata.stack) metadata = `${metadata.stack.replace(/\n/g, "")}`;
-                        else metadata = `${metadata.name}: ${metadata.message}`;
-                    }
-                    else {
-                        metadata = `${metadata.name}: ${metadata.message}`;
+                    extra = `${metadata.name}: ${metadata.message}`;
+
+                    if (this.config.level === "verbose") {
+                        if (metadata.stack) extra = metadata.stack.replace(/\n/g, "");
                     }
                 }
+                else extra = metadata ? JSON.stringify(metadata) : "";
 
                 const now = new Date();
                 const timestamp = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}.${now.getMilliseconds().toString().padStart(3, '0')}`;
-                return `${timestamp} ${this.config.appName} ${level.toUpperCase()} - ${message} ${metadata ? JSON.stringify(metadata) : ""}`;
+                return `${timestamp} ${this.config.appName} ${level.toUpperCase()} - ${message} ${extra}`;
             }),
         };
     }
