@@ -1,6 +1,6 @@
 import { ILogger } from './ILogger';
 import { WinstonLogger } from './strategies/WinstonLogger';
-import { ILoggerConfig, LoggerConfig } from './LoggerConfig';
+import { ILoggerConfig, LoggerConfigurator } from './LoggerConfig';
 
 /**
  * Factory class for creating logger instances.
@@ -15,7 +15,7 @@ export class LoggerFactory {
      */
     public static getLogger(): ILogger {
         if (!LoggerFactory.instance) {
-            const config = LoggerConfig.loadConfiguration();
+            const config = LoggerConfigurator.loadConfiguration();
             this.instance = this.createInstance(config);
         }
 

@@ -1,89 +1,16 @@
 import path from 'path';
 import winston from 'winston';
 import { v4 as uuidv4 } from 'uuid';
-import { ILogger, TMetadata } from '../ILogger';
-import { ILoggerConfig, TLogLevels } from '../LoggerConfig';
-
-abstract class LogAdapter implements ILogger {
-    protected logger: ILogger;
-    protected config: ILoggerConfig;
-
-    constructor(config: ILoggerConfig) {
-        this.config = config;
-        this.logger = this.createLogger(config);
-
-        if (config.level === "verbose") {
-            this.overwriteConsole();
-        }
-        else {
-            this.noConsole();
-        }
-    }
-
-    public abstract verbose(message: string, metadata?: TMetadata): void;
-    public abstract debug(message: string, metadata?: TMetadata): void;
-    public abstract info(message: string, metadata?: TMetadata): void;
-    public abstract log(message: string, metadata?: TMetadata): void;
-    public abstract warn(message: string, metadata?: TMetadata): void;
-    public abstract error(message: string, metadata?: TMetadata): void;
-    public abstract critical(message: string, metadata?: TMetadata): void;
-
-    /**
-     * Creates the logger instance based on the configuration settings. 
-     * @param config - {@link ILoggerConfig} object containing the logger configuration. 
-     */
-    protected abstract createLogger(config: ILoggerConfig): ILogger;
-
-    /**
-     * Overwrites the console methods to log to the application's logger instead.
-     */
-    private overwriteConsole(): void {
-        console.debug = (...args: any[]) => {
-            this.verbose(`console.debug ${args[0]} `, args[1]);
-        }
-
-        console.log = (...args: any[]) => {
-            this.verbose(`console.log ${args[0]} `, args[1]);
-        }
-
-        console.info = (...args: any[]) => {
-            this.verbose(`console.info ${args[0]} `, args[1]);
-        }
-
-        console.warn = (...args: any[]) => {
-            this.verbose(`console.warn ${args[0]} `, args[1]);
-        }
-
-        console.error = (...args: any[]) => {
-            this.verbose(`console.error ${args[0]} `, args[1]);
-        }
-    }
-
-    /**
-     * Overwrites the console methods to do nothing.
-     */
-    private noConsole(): void {
-        console.debug = () => { };
-        console.log = () => { };
-        console.info = () => { };
-        console.warn = () => { };
-        console.error = () => { };
-    }
-}
+import { TMetadata } from '../ILogger';
+import { TLogLevels } from '../LoggerConfig';
+import { AbstractLogAdapter } from './AbstractLogAdapter';
 
 /**
- * WinstonAdapter class translates ILogger interface calls to Winston's logging methods.
+ * The Adapter responsible for logging messages using the Winston library.
+ * @extends LogAdapter The base class for all log adapters.
  */
-export class WinstonAdapter implements ILogger {
-    private logger: winston.Logger;
-    private config: ILoggerConfig;
-
-    constructor(config: ILoggerConfig) {
-        this.config = config;
-        this.logger = this.createLogger(config);
-
-        this.critical("Logger initialized. Config:", config);
-    }
+export class WinstonAdapter extends AbstractLogAdapter<winston.Logger> {
+    protected name = "WinstonAdapter";
 
     public verbose(message: string, metadata?: TMetadata): void {
         this.handle('verbose', message, metadata);
@@ -98,7 +25,8 @@ export class WinstonAdapter implements ILogger {
     }
 
     public log(message: string, metadata?: TMetadata): void {
-        this.handle('log', message, metadata);
+        // @ts-ignore 
+        this.handle('normal', message, metadata); // log (log is used by winston)
     }
 
     public warn(message: string, metadata?: TMetadata): void {
@@ -113,48 +41,7 @@ export class WinstonAdapter implements ILogger {
         this.handle('critical', message, metadata); // Winston does not have a 'critical' level by default, mapping to 'error'
     }
 
-    /**
-     * Writes a log entry with the given level, message, and extra data.
-     * @param level The log level (e.g., 'info', 'debug', 'error', etc.).
-     * @param message The log message.
-     * @param extra Optional extra data to include in the log entry.
-     */
-    private async handle(level: TLogLevels, message: string, metadata?: TMetadata): Promise<void> {
-        // @ts-ignore
-        if (level === "log") level === "normal";
-        if (!metadata) {
-            this.logger.log(level, message);
-            return;
-        }
-
-        if (metadata instanceof Error) {
-            metadata = {
-                name: metadata.name,
-                message: metadata.message,
-                stack: metadata.stack,
-            };
-        }
-
-        // if (metadata instanceof Error) {
-        //     if (this.config.level === "verbose" || this.config.level === "debug") {
-        //         metadata = {
-        //             Name: metadata.name,
-        //             Message: metadata.message,
-        //             Stack: metadata.stack,
-        //         };
-        //     }
-        //     else {
-        //         metadata = {
-        //             Name: metadata.name,
-        //             Message: metadata.message,
-        //         };
-        //     }
-        // }
-
-        this.logger.log(level, message, { metadata });
-    }
-
-    private createLogger(config: ILoggerConfig) {
+    protected create() {
         const customLevels = {
             critical: 0,
             error: 1,
@@ -167,16 +54,16 @@ export class WinstonAdapter implements ILogger {
 
         const transports: winston.transport[] = [];
 
-        if (config.console) {
-            transports.push(new winston.transports.Console(this.configureConsoleTransport(config)));
+        if (this.config.console) {
+            transports.push(new winston.transports.Console(this.configureConsoleTransport()));
         }
 
-        if (config.file) {
-            transports.push(new winston.transports.File(this.configureFileTransport(config)));
+        if (this.config.file.enabled) {
+            transports.push(new winston.transports.File(this.configureFileTransport()));
         }
 
-        if (config.http) {
-            transports.push(new winston.transports.Http(this.configureHttpTransport(config)));
+        if (this.config.http.enabled) {
+            transports.push(new winston.transports.Http(this.configureHttpTransport()));
         }
 
         const logger = winston.createLogger({
@@ -184,52 +71,71 @@ export class WinstonAdapter implements ILogger {
             transports: transports,
         });
 
-        // Overwrite console methods for logging
-        if (config.level === "verbose") {
-            this.overwriteConsole();
-        }
-        else {
-            this.noConsole();
-        }
-
         return logger;
     }
 
     /**
+     * Writes a log entry with the given level, message, and extra data.
+     * @param level The log level (e.g., 'info', 'debug', 'error', etc.).
+     * @param message The log message.
+     * @param extra Optional extra data to include in the log entry.
+     */
+    private handle(level: TLogLevels, message: string, metadata?: TMetadata): void {
+        this.logger.log(level, message, { metadata });
+    }
+
+    /**
      * Configures the console transport based on the ILoggerConfig.
-     * @param config - ILoggerConfig object containing the logger configuration.
      * @returns A winston.transports.ConsoleTransportOptions instance.
      */
-    private configureConsoleTransport(config: ILoggerConfig): winston.transports.ConsoleTransportOptions {
+    private configureConsoleTransport(): winston.transports.ConsoleTransportOptions {
         return {
-            level: config.level,
-            silent: !config.console,
+            level: this.config.level,
+            silent: !this.config.console,
             format: winston.format.printf(({ level, message, metadata }) => {
-                if (level === 'normal') level = "log";
+                if (level === 'normal') level = "log"; // winston uses 'log' for the 'normal' level
 
-                return `${this.config.appName} ${level.toUpperCase()} - ${message} ${metadata ? JSON.stringify(metadata, null, 4) : ""}`;
+                let dataStr = "";
+                if (metadata instanceof Error) {
+                    dataStr = `\n  Error Name: ${metadata.name}\n  Error Message: ${metadata.message}\n  Stack Trace:\n${metadata.stack?.split('\n').map(line => '  ' + line).join('\n')}`;
+                } else {
+                    dataStr = metadata ? "\n" + JSON.stringify(metadata, null, 4) : "";
+                }
+
+                return `${this.config.appName} ${level.toUpperCase()} - ${message} ${dataStr}`;
             }),
         };
     }
 
     /**
      * Configures the file transport based on the ILoggerConfig.
-     * @param config - ILoggerConfig object containing the logger configuration.
      * @returns A winston.transports.FileTransportOptions instance.
      */
-    private configureFileTransport(config: ILoggerConfig): winston.transports.FileTransportOptions {
-        const file = `${config.appName}_${new Date().toISOString().replace(/[:.]/g, '-')}.log`;
-        const filepath = config.filePath ?? path.join(__dirname, 'logs');
+    private configureFileTransport(): winston.transports.FileTransportOptions {
+        if (!this.config.file.enabled) throw new Error(`${this.name}: Config file is not enabled while trying to configure file transport.`);
+
+        if (!this.config.file.name) this.config.file.name = `${this.config.appName}_${new Date().toISOString().replace(/[:.]/g, '-')}.log`;
+        if (!this.config.file.path) this.config.file.path = path.join(__dirname, '../', '../', 'logs');
 
         return {
-            level: config.level,
-            filename: path.join(filepath, file),
-            silent: !config.file,
+            level: this.config.level,
+            filename: path.join(this.config.file.path, this.config.file.name),
+            silent: !this.config.file.enabled,
             format: winston.format.printf(({ level, message, metadata }) => {
+                if (level === 'normal') level = "log"; // winston uses 'log' for the 'normal' level
+
+                if (metadata instanceof Error) {
+                    if (this.config.level === "verbose" || this.config.level === "debug") {
+                        if (metadata.stack) metadata = `${metadata.stack.replace(/\n/g, "")}`;
+                        else metadata = `${metadata.name}: ${metadata.message}`;
+                    }
+                    else {
+                        metadata = `${metadata.name}: ${metadata.message}`;
+                    }
+                }
+
                 const now = new Date();
                 const timestamp = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}.${now.getMilliseconds().toString().padStart(3, '0')}`;
-                if (level === 'normal') level = "log";
-
                 return `${timestamp} ${this.config.appName} ${level.toUpperCase()} - ${message} ${metadata ? JSON.stringify(metadata) : ""}`;
             }),
         };
@@ -240,11 +146,12 @@ export class WinstonAdapter implements ILogger {
      * **Does not log any debug logging level.**
      * @param config - ILoggerConfig object containing the logger configuration.
      * @returns A winston.transports.HttpTransportOptions instance.
+     * @deprecated This method is not tested and may not work as expected.
      */
-    private configureHttpTransport(config: ILoggerConfig): winston.transports.HttpTransportOptions {
+    private configureHttpTransport(): winston.transports.HttpTransportOptions {
         return {
-            level: config.level === "debug" ? "info" : config.level,
-            silent: config.http,
+            level: this.config.level === "debug" ? "info" : this.config.level,
+            silent: !this.config.http.enabled,
             host: 'localhost',
             path: `/${uuidv4()}`,
             ssl: true,
@@ -252,7 +159,7 @@ export class WinstonAdapter implements ILogger {
                 bearer: process.env.BEARER_TOKEN
             },
             format: winston.format.printf(({ level, message, metadata }) => {
-                if (level === 'normal') level = "log";
+                if (level === 'normal') level = "log"; // winston uses 'log' for the 'normal' level
 
                 const payload = {
                     level: level.toUpperCase(),
@@ -270,41 +177,5 @@ export class WinstonAdapter implements ILogger {
                 return JSON.stringify(payload);
             }),
         }
-    }
-
-    /**
-     * Overwrites the console methods to log to the application's logger instead.
-     */
-    private overwriteConsole(): void {
-        console.debug = (...args: any[]) => {
-            this.verbose(`console.debug ${args[0]} `, args[1]);
-        }
-
-        console.log = (...args: any[]) => {
-            this.verbose(`console.log ${args[0]} `, args[1]);
-        }
-
-        console.info = (...args: any[]) => {
-            this.verbose(`console.info ${args[0]} `, args[1]);
-        }
-
-        console.warn = (...args: any[]) => {
-            this.verbose(`console.warn ${args[0]} `, args[1]);
-        }
-
-        console.error = (...args: any[]) => {
-            this.verbose(`console.error ${args[0]} `, args[1]);
-        }
-    }
-
-    /**
-     * Overwrites the console methods to do nothing.
-     */
-    private noConsole(): void {
-        console.debug = () => { };
-        console.log = () => { };
-        console.info = () => { };
-        console.warn = () => { };
-        console.error = () => { };
     }
 }

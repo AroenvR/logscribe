@@ -1,3 +1,4 @@
+import path from 'path';
 import { ILoggerConfig } from '../LoggerConfig';
 import { WinstonAdapter } from '../adapters/WinstonAdapter';
 
@@ -7,9 +8,13 @@ describe('WinstonAdapter', () => {
         driver: 'winston',
         level: 'verbose',
         console: true,
-        file: true,
-        filePath: './logs',
-        http: false,
+        file: {
+            enabled: true,
+            path: path.join(__dirname, 'logs'),
+        },
+        http: {
+            enabled: false
+        }
     }
 
     let adapter: WinstonAdapter;
@@ -34,10 +39,16 @@ describe('WinstonAdapter', () => {
     it.only('should correctly log messages at all levels', () => {
         // const spy = jest.spyOn(adapter, 'error');
 
-        console.log(`FOO`);
+        console.log(`Console message`);
 
-        adapter.error("Test message");
-        adapter.error("Metadata message:", { foo: "bar" });
+        adapter.debug("Debug message");
+        adapter.info("Info message");
+        adapter.log("Log message");
+        adapter.warn("Warn message");
+        adapter.error("Error message");
+        adapter.critical("Critical message");
+
+        // adapter.log("Metadata message:", { foo: "bar" });
         // expect(spy).toHaveBeenCalledWith(testMessage, metadata);
 
         try {

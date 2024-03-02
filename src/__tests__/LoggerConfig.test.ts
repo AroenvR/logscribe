@@ -1,9 +1,9 @@
-import { LoggerConfig } from "../LoggerConfig";
+import { LoggerConfigurator } from "../LoggerConfig";
 
 describe('LoggerConfig', () => {
 
     it('should return default configuration when environment variables are not set', () => {
-        const config = LoggerConfig.loadConfiguration();
+        const config = LoggerConfigurator.loadConfiguration();
 
         expect(config).toEqual({
             driver: 'winston',
