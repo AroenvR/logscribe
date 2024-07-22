@@ -64,6 +64,7 @@ export interface ILoggerConfig {
   console: boolean;
   file: TLoggerFileConfig;
   http: TLoggerHTTPConfig;
+  processWhitelist: string[];
 }
 
 /**
@@ -132,7 +133,8 @@ export class LoggerConfigurator implements ILoggerConfigurator {
       },
       http: {
         enabled: false,
-      }
+      },
+      processWhitelist: [],
     };
 
     // If the environment variable LOGSCRIBE_CONFIG is set, load the configuration from the specified file.

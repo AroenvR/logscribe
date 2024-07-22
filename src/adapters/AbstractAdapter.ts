@@ -1,6 +1,6 @@
 import path from "path";
 import { ILogger, TMetadata } from "../ILogger";
-import { ILoggerConfig } from "../configurator/LoggerConfigurator";
+import { ILoggerConfig, TLogLevels } from "../configurator/LoggerConfigurator";
 import { ICorrelationManager } from "../correlation/ICorrelationManager";
 
 /**
@@ -31,18 +31,61 @@ export abstract class AbstractAdapter<T> implements ILogger {
         this.logger = this.create();
     }
 
-    public abstract verbose(message: string, metadata?: TMetadata): void;
-    public abstract debug(message: string, metadata?: TMetadata): void;
-    public abstract info(message: string, metadata?: TMetadata): void;
-    public abstract log(message: string, metadata?: TMetadata): void;
-    public abstract warn(message: string, metadata?: TMetadata): void;
-    public abstract error(message: string, metadata?: TMetadata): void;
-    public abstract critical(message: string, metadata?: TMetadata): void;
+    public verbose(message: string, metadata?: TMetadata): void {
+        if (this.isWhitelistApproved(message)) this.handle('verbose', message, metadata);
+    }
+
+    public debug(message: string, metadata?: TMetadata): void {
+        if (this.isWhitelistApproved(message)) this.handle('debug', message, metadata);
+    }
+
+    public info(message: string, metadata?: TMetadata): void {
+        if (this.isWhitelistApproved(message)) this.handle('info', message, metadata);
+    }
+
+    public log(message: string, metadata?: TMetadata): void {
+        if (this.isWhitelistApproved(message)) {
+            // @ts-ignore
+            this.handle('normal', message, metadata); // log (log is often used by logging libraries)
+        }
+    }
+
+    public warn(message: string, metadata?: TMetadata): void {
+        if (this.isWhitelistApproved(message)) this.handle('warn', message, metadata);
+    }
+
+    public error(message: string, metadata?: TMetadata): void {
+        if (this.isWhitelistApproved(message)) this.handle('error', message, metadata);
+    }
+
+    public critical(message: string, metadata?: TMetadata): void {
+        if (this.isWhitelistApproved(message)) this.handle('critical', message, metadata);
+    }
+
+    /**
+     * Writes a log entry with the given level, message, and extra data.
+     * @param level The log level (e.g., 'info', 'debug', 'error', etc.).
+     * @param message The log message.
+     * @param extra Optional extra data to include in the log entry.
+     */
+    protected abstract handle(level: TLogLevels, message: string, metadata?: TMetadata): void;
 
     /**
      * Creates the logger instance based on the configuration settings. 
      */
     protected abstract create(): T;
+
+    /**
+     * 
+     * @param message 
+     */
+    private isWhitelistApproved(message: string): boolean {
+        for (const item of this.config.processWhitelist) {
+            if (message.startsWith(item)) return true;
+        }
+
+        return false;
+    }
 
     /**
      * Overwrites the default console logging functions.  

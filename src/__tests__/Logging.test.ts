@@ -1,3 +1,6 @@
+import path from "path";
+import fs from "fs-extra";
+import { v4 as uuidv4 } from 'uuid';
 import { ILoggerConfigurator, LoggerConfigurator, TLoggerOptions } from "../configurator/LoggerConfigurator";
 import { CorrelationManager } from "../correlation/CorrelationManager";
 import { ICorrelationManager } from "../correlation/ICorrelationManager";
@@ -5,6 +8,9 @@ import { StaticLoggerFactory } from "../factory/LoggerFactory";
 import { ILogger } from "../ILogger";
 
 describe("Integration test for logging", () => {
+    const logDir = "./test_logs";
+    const logFile = "Logging.log";
+
     let configurator: ILoggerConfigurator;
     let correlationManager: ICorrelationManager;
 
@@ -14,17 +20,20 @@ describe("Integration test for logging", () => {
         const opts: TLoggerOptions = {
             loader: "object",
             config: {
-                appName: 'JestTest',
+                appName: 'IntegrationTest',
                 driver: 'winston',
                 enableCorrelation: true,
                 level: 'verbose',
-                console: true,
+                console: false,
                 file: {
-                    enabled: false
+                    enabled: true,
+                    path: logDir,
+                    name: logFile
                 },
                 http: {
                     enabled: false
-                }
+                },
+                processWhitelist: ["TEST", "console.log"]
             }
         }
         configurator = new LoggerConfigurator(opts);
@@ -38,27 +47,45 @@ describe("Integration test for logging", () => {
     afterEach(() => {
         jest.restoreAllMocks();
         jest.resetAllMocks();
+
+        // if (fs.existsSync(logDir)) fs.rm(logDir, { recursive: true });
     });
 
     // ------------------------------
 
-    test("Should log a verbose message", () => {
-        const firstCorrelationId = "first-correlationId";
-        const secondCorrelationId = "second-correlationId";
+    test("Should log to a file with a timestamp, app name, correlation id, log level, message and metadata.", async () => {
+        const firstCorrelationId = uuidv4();
+        const secondCorrelationId = uuidv4();
 
         correlationManager.runWithCorrelationId(firstCorrelationId, () => {
-            logger.verbose("This is a verbose message.");
-            logger.debug("This is a debug message.");
+            console.log("This is a verbose message.");
+
+            logger.debug("TEST: This is a debug message with data:", { foo: "bar" });
+            logger.info("TEST: This is an info message.");
 
             correlationManager.runWithCorrelationId(secondCorrelationId, () => {
-                logger.info("This is an info message.");
-                logger.log("This is a log message.");
-                logger.warn("This is a warn message.");
+                logger.log("TEST: This is a log message.");
+                logger.warn("TEST: This is a warn message.");
             });
 
-            logger.error("This is an error message.");
-            logger.critical("This is a critical message.");
+            logger.error("TEST: This is an error message.", new Error(`Foo: bar!`));
+            logger.critical("TEST: This is a critical message.");
         });
 
+        const logFilePath = path.join(logDir, logFile);
+        expect(await fs.exists(logDir)).toBe(true);
+        expect(await fs.exists(logFilePath)).toBe(true);
+
+        const logContent = await fs.readFile(logFilePath, "utf-8");
+
+        expect(logContent).toContain(`IntegrationTest ${firstCorrelationId} VERBOSE - console.log This is a verbose message.`);
+        expect(logContent).toContain(`IntegrationTest ${firstCorrelationId} DEBUG - TEST: This is a debug message with data: {"foo":"bar"}`);
+        expect(logContent).toContain(`IntegrationTest ${firstCorrelationId} INFO - TEST: This is an info message.`);
+
+        expect(logContent).toContain(`IntegrationTest ${secondCorrelationId} LOG - TEST: This is a log message.`);
+        expect(logContent).toContain(`IntegrationTest ${secondCorrelationId} WARN - TEST: This is a warn message.`);
+
+        expect(logContent).toContain(`IntegrationTest ${firstCorrelationId} ERROR - TEST: This is an error message. Error: Foo: bar!`);
+        expect(logContent).toContain(`IntegrationTest ${firstCorrelationId} CRITICAL - TEST: This is a critical message.`);
     });
 });

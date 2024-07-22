@@ -14,7 +14,8 @@ export const fallbackConfig: ILoggerConfig = {
     },
     http: {
         enabled: false,
-    }
+    },
+    processWhitelist: []
 }
 
 /**
@@ -31,5 +32,6 @@ export const defaultConfig: ILoggerConfig = {
     },
     http: {
         enabled: false
-    }
+    },
+    processWhitelist: ["TEST", "console.log"]
 }

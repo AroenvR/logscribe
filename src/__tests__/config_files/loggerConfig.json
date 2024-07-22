@@ -9,5 +9,9 @@
     },
     "http": {
         "enabled": false
-    }
+    },
+    "processWhitelist": [
+        "TEST",
+        "console.log"
+    ]
 }

@@ -14,7 +14,8 @@ describe('LoggerConfig', () => {
         },
         http: {
             enabled: false,
-        }
+        },
+        processWhitelist: ["TEST", "console.log"]
     }
 
     // ------------------------------
@@ -60,7 +61,8 @@ describe('LoggerConfig', () => {
             },
             http: {
                 enabled: false
-            }
+            },
+            processWhitelist: ["TEST", "console.log"]
         }
         const configurator = new LoggerConfigurator({ loader: "object", config: defaultConfig });
         const config = configurator.loadConfiguration();

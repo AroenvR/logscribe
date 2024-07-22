@@ -12,35 +12,6 @@ import { AbstractAdapter } from './AbstractAdapter';
 export class WinstonAdapter extends AbstractAdapter<winston.Logger> {
     protected name = "WinstonAdapter";
 
-    public verbose(message: string, metadata?: TMetadata): void {
-        this.handle('verbose', message, metadata);
-    }
-
-    public debug(message: string, metadata?: TMetadata): void {
-        this.handle('debug', message, metadata);
-    }
-
-    public info(message: string, metadata?: TMetadata): void {
-        this.handle('info', message, metadata);
-    }
-
-    public log(message: string, metadata?: TMetadata): void {
-        // @ts-ignore 
-        this.handle('normal', message, metadata); // log (log is used by winston)
-    }
-
-    public warn(message: string, metadata?: TMetadata): void {
-        this.handle('warn', message, metadata);
-    }
-
-    public error(message: string, metadata?: TMetadata): void {
-        this.handle('error', message, metadata);
-    }
-
-    public critical(message: string, metadata?: TMetadata): void {
-        this.handle('critical', message, metadata); // Winston does not have a 'critical' level by default, mapping to 'error'
-    }
-
     protected create() {
         const customLevels = {
             critical: 0,
@@ -80,7 +51,7 @@ export class WinstonAdapter extends AbstractAdapter<winston.Logger> {
      * @param message The log message.
      * @param extra Optional extra data to include in the log entry.
      */
-    private handle(level: TLogLevels, message: string, metadata?: TMetadata): void {
+    protected handle(level: TLogLevels, message: string, metadata?: TMetadata): void {
         this.logger.log(level, message, { metadata });
     }
 

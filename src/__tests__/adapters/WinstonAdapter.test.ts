@@ -15,7 +15,8 @@ const defaultConfig: ILoggerConfig = {
     },
     http: {
         enabled: false
-    }
+    },
+    processWhitelist: ["TEST", "console.log"]
 }
 
 describe('WinstonAdapter', () => {
@@ -40,7 +41,7 @@ describe('WinstonAdapter', () => {
     it('Handles verbose messages correctly', () => {
         const spy = jest.spyOn(adapter, 'verbose').mockImplementation();
 
-        const message = 'Verbose test message';
+        const message = 'TEST: Verbose test message';
         const metadata = { key: 'value' };
 
         adapter.verbose(message, metadata);
@@ -52,7 +53,7 @@ describe('WinstonAdapter', () => {
     it('Overwrites the console correctly', () => {
         const spy = jest.spyOn(adapter, 'verbose').mockImplementation();
 
-        const message = 'Verbose test message';
+        const message = 'TEST: Verbose test message';
         const metadata = { key: 'value' };
 
         console.log(message, metadata)
@@ -72,7 +73,7 @@ describe('WinstonAdapter', () => {
     it('Handles debug messages correctly', () => {
         const spy = jest.spyOn(adapter, 'debug').mockImplementation();
 
-        const message = 'Debug test message';
+        const message = 'TEST: Debug test message';
         const metadata = { key: 'value' };
 
         adapter.debug(message, metadata);
@@ -84,7 +85,7 @@ describe('WinstonAdapter', () => {
     it('Handles info messages correctly', () => {
         const spy = jest.spyOn(adapter, 'info').mockImplementation();
 
-        const message = 'Info test message';
+        const message = 'TEST: Info test message';
         const metadata = { key: 'value' };
 
         adapter.info(message, metadata);
@@ -96,7 +97,7 @@ describe('WinstonAdapter', () => {
     it('Handles log messages correctly', () => {
         const spy = jest.spyOn(adapter, 'log').mockImplementation();
 
-        const message = 'Log test message';
+        const message = 'TEST: Log test message';
         const metadata = { key: 'value' };
 
         adapter.log(message, metadata);
@@ -108,7 +109,7 @@ describe('WinstonAdapter', () => {
     it('Handles warn messages correctly', () => {
         const spy = jest.spyOn(adapter, 'warn').mockImplementation();
 
-        const message = 'Warn test message';
+        const message = 'TEST: Warn test message';
         const metadata = { key: 'value' };
 
         adapter.warn(message, metadata);
@@ -120,7 +121,7 @@ describe('WinstonAdapter', () => {
     it('Handles error messages correctly', () => {
         const spy = jest.spyOn(adapter, 'error').mockImplementation();
 
-        const message = 'Error test message';
+        const message = 'TEST: Error test message';
         const metadata = { key: 'value' };
 
         adapter.error(message, metadata);
@@ -135,8 +136,8 @@ describe('WinstonAdapter', () => {
         try {
             throw new Error('Test error');
         } catch (err: Error | unknown) {
-            adapter.error('An error occurred:', err);
-            expect(spy).toHaveBeenCalledWith('An error occurred:', err);
+            adapter.error('TEST: An error occurred:', err);
+            expect(spy).toHaveBeenCalledWith('TEST: An error occurred:', err);
         }
     });
 
@@ -145,7 +146,7 @@ describe('WinstonAdapter', () => {
     it('Handles critical messages correctly', () => {
         const spy = jest.spyOn(adapter, 'critical').mockImplementation();
 
-        const message = 'Critical test message';
+        const message = 'TEST: Critical test message';
         const metadata = { key: 'value' };
 
         adapter.critical(message, metadata);
