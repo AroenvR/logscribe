@@ -1,8 +1,8 @@
 import path from 'path';
-import { ILogger } from '../ILogger';
-import { LoggerFactory } from '../LoggerFactory';
-import { defaultConfig, fallbackConfig } from './testingConfigs';
-import { TLoggerOptions } from '../LoggerConfigurator';
+import { ILogger } from '../../ILogger';
+import { LoggerFactory } from '../../factory/LoggerFactory';
+import { defaultConfig, fallbackConfig } from '../config_files/testingConfigs';
+import { TLoggerOptions } from '../../configurator/LoggerConfigurator';
 
 describe('LoggerFactory', () => {
     let logger: ILogger;
@@ -24,7 +24,7 @@ describe('LoggerFactory', () => {
     // ------------------------------
 
     it('Creates a logger with the given configuration environment variable', () => {
-        process.env.LOGSCRIBE_CONFIG = path.join(__dirname, 'loggerConfig.json');
+        process.env.LOGSCRIBE_CONFIG = path.join(__dirname, '../', 'config_files', 'loggerConfig.json');
         logger = LoggerFactory.initialize();
 
         expect(logger.config).toEqual(defaultConfig);
@@ -33,7 +33,7 @@ describe('LoggerFactory', () => {
     // ------------------------------
 
     it('Creates a logger with the given configuration file path', () => {
-        const configPath = path.join(__dirname, 'loggerConfig.json');
+        const configPath = path.join(__dirname, '../', 'config_files', 'loggerConfig.json');
         const config: TLoggerOptions = { loader: "file", path: configPath }
         logger = LoggerFactory.initialize(config);
 

@@ -1,4 +1,5 @@
-import { ILoggerConfig } from "./LoggerConfigurator";
+import { ILoggerConfig } from "./configurator/LoggerConfigurator";
+import { ICorrelationManager } from "./correlation/ICorrelationManager";
 
 /**
  * Type definition for metadata that can be attached to log messages.  
@@ -13,6 +14,7 @@ export type TMetadata = Record<string, any> | Error | unknown;
  */
 export interface ILogger {
     config: ILoggerConfig;
+    // correlationManager: ICorrelationManager;
 
     /**
      * Logs verbose messages, intended for detailed internal state logging.

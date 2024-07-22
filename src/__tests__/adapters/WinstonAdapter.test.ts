@@ -1,5 +1,6 @@
-import { WinstonAdapter } from '../adapters/WinstonAdapter';
-import { ILoggerConfig } from "../LoggerConfigurator";
+import { WinstonAdapter } from '../../adapters/WinstonAdapter';
+import { ILoggerConfig } from '../../configurator/LoggerConfigurator';
+// import { CorrelationManager } from '../../correlation/CorrelationManager';
 
 const defaultConfig: ILoggerConfig = {
     appName: 'JestTest',
@@ -15,6 +16,7 @@ const defaultConfig: ILoggerConfig = {
 }
 
 describe('WinstonAdapter', () => {
+    // const correlationManager = new CorrelationManager();
     const adapter = new WinstonAdapter(defaultConfig);
 
     afterEach(() => {

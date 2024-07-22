@@ -2,7 +2,7 @@ import path from 'path';
 import winston from 'winston';
 import { v4 as uuidv4 } from 'uuid';
 import { TMetadata } from '../ILogger';
-import { TLogLevels } from '../LoggerConfigurator';
+import { TLogLevels } from '../configurator/LoggerConfigurator';
 import { AbstractAdapter } from './AbstractAdapter';
 
 /**
@@ -81,6 +81,7 @@ export class WinstonAdapter extends AbstractAdapter<winston.Logger> {
      * @param extra Optional extra data to include in the log entry.
      */
     private handle(level: TLogLevels, message: string, metadata?: TMetadata): void {
+        // const id = this.correlationManager.getCorrelationId();
         this.logger.log(level, message, { metadata });
     }
 

@@ -1,5 +1,5 @@
 import fs from 'fs-extra';
-import { AbstractAdapter } from "./adapters/AbstractAdapter";
+import { AbstractAdapter } from "../adapters/AbstractAdapter";
 
 /**
  * The drivers supported by the application for logging.
@@ -83,16 +83,13 @@ export type TLoggerOptions = {
 }
 
 /**
- * Class responsible for loading and providing logger configuration settings.
+ * Interface for the logger configurator.
+ * @property opts The options for the logger configurator.
+ * @property config The configuration settings for the logger.
  */
-export class LoggerConfigurator {
-  private readonly name = 'LoggerConfigurator';
-  private _opts: TLoggerOptions | null = null;
-  private _config: ILoggerConfig | null = null;
-
-  constructor(opts?: TLoggerOptions) {
-    if (opts) this._opts = opts;
-  }
+export interface ILoggerConfigurator {
+  opts: TLoggerOptions | null;
+  config: ILoggerConfig | null;
 
   /**
    * Loads the configuration settings.
@@ -102,9 +99,28 @@ export class LoggerConfigurator {
    * If the environment variable is not set, it will load the configuration based on the provided options.  
    * If no options are provided, it will return the default configuration.
    */
-  public loadConfiguration(): ILoggerConfig {
-    // Set the fallback configuration.
-    const fallbackConfig: ILoggerConfig = {
+  loadConfiguration(fallbackConfig?: ILoggerConfig): ILoggerConfig;
+}
+
+/**
+ * Class responsible for loading and providing logger configuration settings.
+ * @implements The {@link ILoggerConfigurator} interface.
+ */
+export class LoggerConfigurator implements ILoggerConfigurator {
+  private readonly name = 'LoggerConfigurator';
+  private _opts: TLoggerOptions | null = null;
+  private _config: ILoggerConfig | null = null;
+
+  constructor(opts?: TLoggerOptions) {
+    if (opts) this._opts = opts;
+  }
+
+  /**
+   * 
+   */
+  public loadConfiguration(fallbackConfig?: ILoggerConfig): ILoggerConfig {
+    // Set a fallback configuration failsafe.
+    if (!fallbackConfig) fallbackConfig = {
       appName: 'UNKNOWN-SET_TO_DEFAULT_CONFIG',
       driver: 'winston',
       level: 'critical',
@@ -147,16 +163,18 @@ export class LoggerConfigurator {
     return this.config;
   };
 
-  private get opts(): TLoggerOptions | null {
+  /* Getters & Setters */
+
+  public get opts(): TLoggerOptions | null {
     return this._opts;
+  }
+
+  public get config(): ILoggerConfig {
+    if (!this._config) throw new Error(`${this.name}: Configuration has not been loaded.`);
+    return this._config;
   }
 
   private set config(config: ILoggerConfig) {
     this._config = config;
-  }
-
-  private get config(): ILoggerConfig {
-    if (!this._config) throw new Error(`${this.name}: Configuration has not been loaded.`);
-    return this._config;
   }
 }

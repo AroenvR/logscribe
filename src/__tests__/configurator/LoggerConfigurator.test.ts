@@ -1,6 +1,6 @@
 import path from "path";
-import { ILoggerConfig, LoggerConfigurator } from "../LoggerConfigurator";
-import { fallbackConfig } from "./testingConfigs";
+import { ILoggerConfig, LoggerConfigurator } from "../../configurator/LoggerConfigurator";
+import { fallbackConfig } from "../config_files/testingConfigs";
 
 describe('LoggerConfig', () => {
     const loadedConfig: ILoggerConfig = {
@@ -28,7 +28,7 @@ describe('LoggerConfig', () => {
     // ------------------------------
 
     it('Should return valid configuration when the right environment variable is set', () => {
-        process.env.LOGSCRIBE_CONFIG = path.join(__dirname, 'loggerConfig.json');
+        process.env.LOGSCRIBE_CONFIG = path.join(__dirname, '../', 'config_files', 'loggerConfig.json');
         const configurator = new LoggerConfigurator();
         const config = configurator.loadConfiguration();
 
@@ -38,7 +38,7 @@ describe('LoggerConfig', () => {
     // ------------------------------
 
     it('Should return a valid configuration when given a path to load from ', () => {
-        const configPath = path.join(__dirname, 'loggerConfig.json');
+        const configPath = path.join(__dirname, '../', 'config_files', 'loggerConfig.json');
         const configurator = new LoggerConfigurator({ loader: "file", path: configPath });
         const config = configurator.loadConfiguration();
 
@@ -69,7 +69,7 @@ describe('LoggerConfig', () => {
     // ------------------------------
 
     it('Environment variable configuration overrides a given configuration', () => {
-        process.env.LOGSCRIBE_CONFIG = path.join(__dirname, 'loggerConfig.json');
+        process.env.LOGSCRIBE_CONFIG = path.join(__dirname, '../', 'config_files', 'loggerConfig.json');
 
         const configurator = new LoggerConfigurator({ loader: "object", config: fallbackConfig });
         const config = configurator.loadConfiguration();

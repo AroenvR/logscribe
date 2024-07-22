@@ -1,17 +1,21 @@
 import path from "path";
 import { ILogger, TMetadata } from "../ILogger";
-import { ILoggerConfig } from "../LoggerConfigurator";
+import { ILoggerConfig, TLogLevels } from "../configurator/LoggerConfigurator";
+import { ICorrelationManager } from "../correlation/ICorrelationManager";
 
 /**
  * The base class for all log adapters.  
+ * @implements The {@link ILogger} interface.
  */
 export abstract class AbstractAdapter<T> implements ILogger {
     protected name = "AbstractAdapter";
     protected logger: T;
     private _config: ILoggerConfig;
+    // private _correlationManager: ICorrelationManager;
 
     constructor(config: ILoggerConfig) {
         this._config = config;
+        // this._correlationManager = correlationManager;
 
         // If the environment variable TAIL_TESTING is set to 'true', the log file is written to the logs directory in the project root as tail.test.log.
         if (process.env.TAIL_TESTING === "true") {
@@ -76,7 +80,13 @@ export abstract class AbstractAdapter<T> implements ILogger {
         }
     }
 
+    /* Getters & Setters */
+
     public get config(): ILoggerConfig {
         return this._config;
     }
+
+    // public get correlationManager(): ICorrelationManager {
+    //     return this._correlationManager;
+    // }
 }

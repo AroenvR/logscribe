@@ -1,6 +1,6 @@
-import { ILogger } from './ILogger';
-import { ILoggerConfig, LoggerConfigurator, TLoggerOptions } from './LoggerConfigurator';
-import { WinstonAdapter } from './adapters/WinstonAdapter';
+import { ILogger } from '../ILogger';
+import { ILoggerConfig, LoggerConfigurator, TLoggerOptions } from '../configurator/LoggerConfigurator';
+import { WinstonAdapter } from '../adapters/WinstonAdapter';
 
 /**
  * Factory class for creating logger instances.
@@ -27,7 +27,7 @@ export class LoggerFactory {
      * @returns {ILogger} A logger instance.
      */
     public static initialize(opts?: TLoggerOptions): ILogger {
-        const configurator = new LoggerConfigurator(opts);
+        const configurator = new LoggerConfigurator(opts); // TODO: Get rid of the hard dependency here.
         const configuration = configurator.loadConfiguration();
 
         this.instance = this.createAdapter(configuration);

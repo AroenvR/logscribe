@@ -1,4 +1,4 @@
-import { ILoggerConfig } from "../LoggerConfigurator"
+import { ILoggerConfig } from "../../configurator/LoggerConfigurator"
 
 /**
  * The fallback configuration for the logger.
