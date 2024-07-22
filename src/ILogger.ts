@@ -1,4 +1,5 @@
-import { ILoggerConfig } from "./configurator/LoggerConfigurator";
+
+import { ILoggerConfig } from "./ILoggerConfiguration";
 import { ICorrelationManager } from "./correlation/ICorrelationManager";
 
 /**

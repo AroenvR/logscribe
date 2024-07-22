@@ -6,7 +6,7 @@
   "scripts": {
     "start": "nodemon index.ts",
     "test": "npm run lint; jest",
-    "test:watch": "npm run lint; jest --watchAll",
+    "test:watch": "npm run lint; jest --watchAll --runInBand",
     "test:coverage": "jest --coverage",
     "lint": "eslint 'src/**/*.{ts,tsx}'",
     "build": "tsc"

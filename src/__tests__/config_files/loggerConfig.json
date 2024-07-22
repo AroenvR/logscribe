@@ -10,8 +10,6 @@
     "http": {
         "enabled": false
     },
-    "processWhitelist": [
-        "TEST",
-        "console.log"
-    ]
+    "useWhitelist": false,
+    "prefixWhitelist": []
 }

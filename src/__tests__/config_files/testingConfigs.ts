@@ -1,4 +1,4 @@
-import { ILoggerConfig } from "../../configurator/LoggerConfigurator"
+import { ILoggerConfig } from "../../ILoggerConfiguration"
 
 /**
  * The fallback configuration for the logger.
@@ -15,7 +15,8 @@ export const fallbackConfig: ILoggerConfig = {
     http: {
         enabled: false,
     },
-    processWhitelist: []
+    useWhitelist: false,
+    prefixWhitelist: []
 }
 
 /**
@@ -33,5 +34,6 @@ export const defaultConfig: ILoggerConfig = {
     http: {
         enabled: false
     },
-    processWhitelist: ["TEST", "console.log"]
+    useWhitelist: false,
+    prefixWhitelist: []
 }

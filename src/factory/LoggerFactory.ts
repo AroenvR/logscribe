@@ -1,5 +1,5 @@
 import { ILogger } from '../ILogger';
-import { ILoggerConfig, ILoggerConfigurator } from '../configurator/LoggerConfigurator';
+import { ILoggerConfig } from '../ILoggerConfiguration';
 import { WinstonAdapter } from '../adapters/WinstonAdapter';
 import { ICorrelationManager } from '../correlation/ICorrelationManager';
 

@@ -1,7 +1,5 @@
 import { WinstonAdapter } from '../../adapters/WinstonAdapter';
-import { ILoggerConfig } from '../../configurator/LoggerConfigurator';
-import { CorrelationManager } from '../../correlation/CorrelationManager';
-import { ICorrelationManager } from '../../correlation/ICorrelationManager';
+import { ILoggerConfig } from '../../ILoggerConfiguration';
 import { ILogger } from '../../ILogger';
 
 const defaultConfig: ILoggerConfig = {
@@ -16,11 +14,11 @@ const defaultConfig: ILoggerConfig = {
     http: {
         enabled: false
     },
-    processWhitelist: ["TEST", "console.log"]
+    useWhitelist: false,
+    prefixWhitelist: []
 }
 
 describe('WinstonAdapter', () => {
-    let correlationManager: ICorrelationManager;
     let adapter: ILogger;
 
     beforeEach(() => {

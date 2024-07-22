@@ -2,8 +2,8 @@ import path from 'path';
 import winston from 'winston';
 import { v4 as uuidv4 } from 'uuid';
 import { TMetadata } from '../ILogger';
-import { TLogLevels } from '../configurator/LoggerConfigurator';
 import { AbstractAdapter } from './AbstractAdapter';
+import { TLogLevels } from '../ILoggerConfiguration';
 
 /**
  * The Adapter responsible for logging messages using the Winston library.

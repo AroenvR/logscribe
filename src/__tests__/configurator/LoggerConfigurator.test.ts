@@ -1,6 +1,7 @@
 import path from "path";
-import { ILoggerConfig, LoggerConfigurator } from "../../configurator/LoggerConfigurator";
+import { LoggerConfigurator } from "../../configurator/LoggerConfigurator";
 import { fallbackConfig } from "../config_files/testingConfigs";
+import { ILoggerConfig } from "../../ILoggerConfiguration";
 
 describe('LoggerConfig', () => {
     const loadedConfig: ILoggerConfig = {
@@ -15,7 +16,8 @@ describe('LoggerConfig', () => {
         http: {
             enabled: false,
         },
-        processWhitelist: ["TEST", "console.log"]
+        useWhitelist: false,
+        prefixWhitelist: []
     }
 
     // ------------------------------
@@ -62,7 +64,8 @@ describe('LoggerConfig', () => {
             http: {
                 enabled: false
             },
-            processWhitelist: ["TEST", "console.log"]
+            useWhitelist: false,
+            prefixWhitelist: []
         }
         const configurator = new LoggerConfigurator({ loader: "object", config: defaultConfig });
         const config = configurator.loadConfiguration();

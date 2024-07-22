@@ -1,6 +1,6 @@
 import path from "path";
 import { ILogger, TMetadata } from "../ILogger";
-import { ILoggerConfig, TLogLevels } from "../configurator/LoggerConfigurator";
+import { ILoggerConfig, TLogLevels } from "../ILoggerConfiguration";
 import { ICorrelationManager } from "../correlation/ICorrelationManager";
 
 /**
@@ -80,7 +80,9 @@ export abstract class AbstractAdapter<T> implements ILogger {
      * @param message 
      */
     private isWhitelistApproved(message: string): boolean {
-        for (const item of this.config.processWhitelist) {
+        if (!this.config.useWhitelist) return true;
+
+        for (const item of this.config.prefixWhitelist) {
             if (message.startsWith(item)) return true;
         }
 
