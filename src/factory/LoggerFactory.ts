@@ -1,36 +1,27 @@
 import { ILogger } from '../ILogger';
-import { ILoggerConfig, LoggerConfigurator, TLoggerOptions } from '../configurator/LoggerConfigurator';
+import { ILoggerConfig, ILoggerConfigurator } from '../configurator/LoggerConfigurator';
 import { WinstonAdapter } from '../adapters/WinstonAdapter';
+import { ICorrelationManager } from '../correlation/ICorrelationManager';
 
 /**
  * Factory class for creating logger instances.
- * Utilizes the LoggerConfig for determining the appropriate logger settings based on the environment.
  */
-export class LoggerFactory {
+export class StaticLoggerFactory {
     private static instance: ILogger;
 
     /**
-     * Returns a singleton logger instance.
-     * @returns {ILogger} A logger instance.
+     * 
      */
     public static getLogger(): ILogger {
-        if (!LoggerFactory.instance) {
-            this.instance = this.initialize();
-        }
-
-        return LoggerFactory.instance;
+        if (!StaticLoggerFactory.instance) throw new Error('LoggerFactory: Logger instance not initialized.');
+        return StaticLoggerFactory.instance;
     }
 
     /**
-     * Initializes the logger instance based on the provided configuration settings.
-     * @param opts The configuration settings for the logger.
-     * @returns {ILogger} A logger instance.
+     * 
      */
-    public static initialize(opts?: TLoggerOptions): ILogger {
-        const configurator = new LoggerConfigurator(opts); // TODO: Get rid of the hard dependency here.
-        const configuration = configurator.loadConfiguration();
-
-        this.instance = this.createAdapter(configuration);
+    public static initialize(config: ILoggerConfig, correlationManager?: ICorrelationManager): ILogger {
+        this.instance = this.createAdapter(config, correlationManager);
         return this.instance;
     }
 
@@ -39,10 +30,10 @@ export class LoggerFactory {
      * @param config The configuration settings for the logger.
      * @returns {ILogger} A logger instance.
      */
-    private static createAdapter(config: ILoggerConfig): ILogger {
+    private static createAdapter(config: ILoggerConfig, correlationManager?: ICorrelationManager): ILogger {
         switch (config.driver) {
             case 'winston':
-                return new WinstonAdapter(config);
+                return new WinstonAdapter(config, correlationManager);
 
             default:
                 throw new Error(`LoggerFactory: Unsupported logger driver: ${config.driver}`);

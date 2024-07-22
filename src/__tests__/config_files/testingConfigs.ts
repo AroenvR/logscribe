@@ -6,6 +6,7 @@ import { ILoggerConfig } from "../../configurator/LoggerConfigurator"
 export const fallbackConfig: ILoggerConfig = {
     appName: 'UNKNOWN-SET_TO_DEFAULT_CONFIG',
     driver: 'winston',
+    enableCorrelation: false,
     level: 'critical',
     console: false,
     file: {
@@ -22,6 +23,7 @@ export const fallbackConfig: ILoggerConfig = {
 export const defaultConfig: ILoggerConfig = {
     appName: 'JestTest',
     driver: 'winston',
+    enableCorrelation: false,
     level: 'verbose',
     console: true,
     file: {

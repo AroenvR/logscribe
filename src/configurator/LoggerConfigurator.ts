@@ -59,6 +59,7 @@ export type TLogLevels = 'verbose' | 'debug' | 'info' | 'log' | 'warn' | 'error'
 export interface ILoggerConfig {
   appName: string;
   driver: TLogDrivers;
+  enableCorrelation: boolean;
   level: TLogLevels;
   console: boolean;
   file: TLoggerFileConfig;
@@ -123,6 +124,7 @@ export class LoggerConfigurator implements ILoggerConfigurator {
     if (!fallbackConfig) fallbackConfig = {
       appName: 'UNKNOWN-SET_TO_DEFAULT_CONFIG',
       driver: 'winston',
+      enableCorrelation: false,
       level: 'critical',
       console: false,
       file: {

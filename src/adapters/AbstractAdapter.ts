@@ -1,6 +1,6 @@
 import path from "path";
 import { ILogger, TMetadata } from "../ILogger";
-import { ILoggerConfig, TLogLevels } from "../configurator/LoggerConfigurator";
+import { ILoggerConfig } from "../configurator/LoggerConfigurator";
 import { ICorrelationManager } from "../correlation/ICorrelationManager";
 
 /**
@@ -11,11 +11,11 @@ export abstract class AbstractAdapter<T> implements ILogger {
     protected name = "AbstractAdapter";
     protected logger: T;
     private _config: ILoggerConfig;
-    // private _correlationManager: ICorrelationManager;
+    private _correlationManager: ICorrelationManager | null = null;
 
-    constructor(config: ILoggerConfig) {
+    constructor(config: ILoggerConfig, correlationManager?: ICorrelationManager) {
         this._config = config;
-        // this._correlationManager = correlationManager;
+        if (correlationManager) this._correlationManager = correlationManager;
 
         // If the environment variable TAIL_TESTING is set to 'true', the log file is written to the logs directory in the project root as tail.test.log.
         if (process.env.TAIL_TESTING === "true") {
@@ -86,7 +86,7 @@ export abstract class AbstractAdapter<T> implements ILogger {
         return this._config;
     }
 
-    // public get correlationManager(): ICorrelationManager {
-    //     return this._correlationManager;
-    // }
+    public get correlationManager(): ICorrelationManager | null {
+        return this._correlationManager;
+    }
 }

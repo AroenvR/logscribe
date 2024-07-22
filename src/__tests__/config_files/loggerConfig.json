@@ -1,6 +1,7 @@
 {
     "appName": "JestTest",
     "driver": "winston",
+    "enableCorrelation": false,
     "level": "verbose",
     "console": true,
     "file": {

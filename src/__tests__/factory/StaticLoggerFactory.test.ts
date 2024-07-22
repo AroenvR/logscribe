@@ -1,8 +1,8 @@
 import path from 'path';
 import { ILogger } from '../../ILogger';
-import { LoggerFactory } from '../../factory/LoggerFactory';
-import { defaultConfig, fallbackConfig } from '../config_files/testingConfigs';
-import { TLoggerOptions } from '../../configurator/LoggerConfigurator';
+import { StaticLoggerFactory } from '../../factory/LoggerFactory';
+import { defaultConfig } from '../config_files/testingConfigs';
+import { LoggerConfigurator } from '../../configurator/LoggerConfigurator';
 
 describe('LoggerFactory', () => {
     let logger: ILogger;
@@ -14,18 +14,18 @@ describe('LoggerFactory', () => {
 
     // ------------------------------
 
-    it("Gets a logger with default configuration if no settings are found", () => {
-        logger = LoggerFactory.getLogger();
-
-        expect(logger).toBeDefined();
-        expect(logger.config).toEqual(fallbackConfig);
+    it("Throws an error if no settings are found", () => {
+        expect(() => StaticLoggerFactory.getLogger()).toThrowError('LoggerFactory: Logger instance not initialized.');
     });
 
     // ------------------------------
 
     it('Creates a logger with the given configuration environment variable', () => {
         process.env.LOGSCRIBE_CONFIG = path.join(__dirname, '../', 'config_files', 'loggerConfig.json');
-        logger = LoggerFactory.initialize();
+        let configurator = new LoggerConfigurator();
+
+        const config = configurator.loadConfiguration();
+        logger = StaticLoggerFactory.initialize(config);
 
         expect(logger.config).toEqual(defaultConfig);
     });
@@ -34,8 +34,10 @@ describe('LoggerFactory', () => {
 
     it('Creates a logger with the given configuration file path', () => {
         const configPath = path.join(__dirname, '../', 'config_files', 'loggerConfig.json');
-        const config: TLoggerOptions = { loader: "file", path: configPath }
-        logger = LoggerFactory.initialize(config);
+        let configurator = new LoggerConfigurator({ loader: "file", path: configPath });
+
+        const config = configurator.loadConfiguration();
+        logger = StaticLoggerFactory.initialize(config);
 
         expect(logger.config).toEqual(defaultConfig);
     });
@@ -43,8 +45,10 @@ describe('LoggerFactory', () => {
     // ------------------------------
 
     it('Creates a logger with the given configuration object', () => {
-        let config: TLoggerOptions = { loader: "object", config: defaultConfig }
-        logger = LoggerFactory.initialize(config);
+        let configurator = new LoggerConfigurator({ loader: "object", config: defaultConfig });
+
+        const config = configurator.loadConfiguration();
+        logger = StaticLoggerFactory.initialize(config);
 
         expect(logger.config).toEqual(defaultConfig);
     });
@@ -52,8 +56,8 @@ describe('LoggerFactory', () => {
     // ------------------------------
 
     it('Returns a singleton logger instance', () => {
-        const loggerOne = LoggerFactory.getLogger();
-        const loggerTwo = LoggerFactory.getLogger();
+        const loggerOne = StaticLoggerFactory.getLogger();
+        const loggerTwo = StaticLoggerFactory.getLogger();
 
         expect(loggerOne).toBeDefined();
         expect(loggerTwo).toBeDefined();

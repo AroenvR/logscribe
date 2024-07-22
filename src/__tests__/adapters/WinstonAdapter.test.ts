@@ -1,10 +1,13 @@
 import { WinstonAdapter } from '../../adapters/WinstonAdapter';
 import { ILoggerConfig } from '../../configurator/LoggerConfigurator';
-// import { CorrelationManager } from '../../correlation/CorrelationManager';
+import { CorrelationManager } from '../../correlation/CorrelationManager';
+import { ICorrelationManager } from '../../correlation/ICorrelationManager';
+import { ILogger } from '../../ILogger';
 
 const defaultConfig: ILoggerConfig = {
     appName: 'JestTest',
     driver: 'winston',
+    enableCorrelation: false,
     level: 'verbose',
     console: true,
     file: {
@@ -16,13 +19,21 @@ const defaultConfig: ILoggerConfig = {
 }
 
 describe('WinstonAdapter', () => {
-    // const correlationManager = new CorrelationManager();
-    const adapter = new WinstonAdapter(defaultConfig);
+    let correlationManager: ICorrelationManager;
+    let adapter: ILogger;
+
+    beforeEach(() => {
+        adapter = new WinstonAdapter(defaultConfig);
+    });
 
     afterEach(() => {
         jest.restoreAllMocks();
         jest.resetAllMocks();
     });
+
+    // ------------------------------
+
+    // It can log with a correlation ID
 
     // ------------------------------
 

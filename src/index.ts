@@ -6,6 +6,6 @@ export { ILoggerConfig } from "./configurator/LoggerConfigurator";
 export { TLoggerOptions } from "./configurator/LoggerConfigurator";
 
 // Classes
-export { LoggerFactory } from "./factory/LoggerFactory";
+export { StaticLoggerFactory as LoggerFactory } from "./factory/LoggerFactory";
 export { LoggerConfigurator } from "./configurator/LoggerConfigurator";
 // export { CorrelationManager } from "./correlation/CorrelationManager";

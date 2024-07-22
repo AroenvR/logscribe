@@ -81,8 +81,23 @@ export class WinstonAdapter extends AbstractAdapter<winston.Logger> {
      * @param extra Optional extra data to include in the log entry.
      */
     private handle(level: TLogLevels, message: string, metadata?: TMetadata): void {
-        // const id = this.correlationManager.getCorrelationId();
         this.logger.log(level, message, { metadata });
+    }
+
+    /**
+     * Formats the log message with the given level, message, and extra data for a log transport.
+     * @param level The log level of the message to output.
+     * @param message The message to output.
+     * @param extra The extra data to include in the log entry.
+     */
+    private formatMessage(level: string, message: string, extra: TMetadata) {
+        const now = new Date();
+        const timestamp = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}.${now.getMilliseconds().toString().padStart(3, '0')}`;
+
+        let msg = `${timestamp} ${this.config.appName}`;
+        msg += this.config.enableCorrelation && this.correlationManager ? ` ${this.correlationManager.getCorrelationId()}` : "";
+        msg += ` ${level.toUpperCase()} - ${message} ${extra}`;
+        return msg;
     }
 
     /**
@@ -106,7 +121,7 @@ export class WinstonAdapter extends AbstractAdapter<winston.Logger> {
                 }
                 else extra = metadata ? JSON.stringify(metadata, null, 4) : "";
 
-                return `${this.config.appName} ${level.toUpperCase()} - ${message} ${extra}`;
+                return this.formatMessage(level, message, extra);
             }),
         };
     }
@@ -138,9 +153,7 @@ export class WinstonAdapter extends AbstractAdapter<winston.Logger> {
                 }
                 else extra = metadata ? JSON.stringify(metadata) : "";
 
-                const now = new Date();
-                const timestamp = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}.${now.getMilliseconds().toString().padStart(3, '0')}`;
-                return `${timestamp} ${this.config.appName} ${level.toUpperCase()} - ${message} ${extra}`;
+                return this.formatMessage(level, message, extra);
             }),
         };
     }
@@ -150,7 +163,7 @@ export class WinstonAdapter extends AbstractAdapter<winston.Logger> {
      * **Does not log any debug logging level.**
      * @param config - ILoggerConfig object containing the logger configuration.
      * @returns A winston.transports.HttpTransportOptions instance.
-     * @deprecated This method is not tested and may not work as expected.
+     * @deprecated This method was never tested and may not work as expected.
      */
     private configureHttpTransport(): winston.transports.HttpTransportOptions {
         return {
@@ -166,8 +179,9 @@ export class WinstonAdapter extends AbstractAdapter<winston.Logger> {
                 if (level === 'normal') level = "log"; // winston uses 'log' for the 'normal' level
 
                 const payload = {
-                    level: level.toUpperCase(),
                     appName: this.config.appName,
+                    correlationId: this.config.enableCorrelation && this.correlationManager ? ` ${this.correlationManager.getCorrelationId()}` : "",
+                    level: level.toUpperCase(),
                     timestamp: new Date().getTime(),
                     message: message,
                     metadata: metadata instanceof Error ? {

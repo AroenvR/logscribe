@@ -6,6 +6,7 @@ describe('LoggerConfig', () => {
     const loadedConfig: ILoggerConfig = {
         appName: 'JestTest',
         driver: 'winston',
+        enableCorrelation: false,
         level: 'verbose',
         console: true,
         file: {
@@ -51,6 +52,7 @@ describe('LoggerConfig', () => {
         const defaultConfig: ILoggerConfig = {
             appName: 'JestTest',
             driver: 'winston',
+            enableCorrelation: false,
             level: 'verbose',
             console: true,
             file: {
