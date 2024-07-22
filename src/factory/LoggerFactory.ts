@@ -1,26 +1,47 @@
-import { ILogger } from '../ILogger';
-import { ILoggerConfig } from '../ILoggerConfiguration';
-import { WinstonAdapter } from '../adapters/WinstonAdapter';
-import { ICorrelationManager } from '../correlation/ICorrelationManager';
+import { WinstonAdapter } from "../adapters/WinstonAdapter";
+import { ICorrelationManager } from "../correlation/ICorrelationManager";
+import { ILogger } from "../ILogger";
+import { ILoggerConfig } from "../ILoggerConfiguration";
+import { ILoggerFactory } from "./ILoggerFactory";
 
 /**
  * Factory class for creating logger instances.
+ * @implements The {@link ILoggerFactory} interface.
  */
-export class StaticLoggerFactory {
-    private static instance: ILogger;
+export class LoggerFactory implements ILoggerFactory {
+    private readonly name = "LoggerFactory";
+    protected _instance: ILogger | null = null;
 
     /**
      * 
      */
-    public static getLogger(): ILogger {
-        if (!StaticLoggerFactory.instance) throw new Error('LoggerFactory: Logger instance not initialized.');
-        return StaticLoggerFactory.instance;
+    public getLogger(): ILogger {
+        return this.instance;
     }
 
     /**
      * 
      */
-    public static initialize(config: ILoggerConfig, correlationManager?: ICorrelationManager): ILogger {
+    public getPrefixedLogger(prefix: string): ILogger {
+        const prefixedLogger: ILogger = {
+            config: this.instance.config,
+            correlationManager: this.instance.correlationManager,
+            verbose: (message: string, metadata?: any) => this.instance.verbose(`${prefix}: ${message}`, metadata),
+            debug: (message: string, metadata?: any) => this.instance.debug(`${prefix}: ${message}`, metadata),
+            info: (message: string, metadata?: any) => this.instance.info(`${prefix}: ${message}`, metadata),
+            log: (message: string, metadata?: any) => this.instance.log(`${prefix}: ${message}`, metadata),
+            warn: (message: string, metadata?: any) => this.instance.warn(`${prefix}: ${message}`, metadata),
+            error: (message: string, metadata?: any) => this.instance.error(`${prefix}: ${message}`, metadata),
+            critical: (message: string, metadata?: any) => this.instance.critical(`${prefix}: ${message}`, metadata),
+        };
+
+        return prefixedLogger;
+    }
+
+    /**
+     * 
+     */
+    public initialize(config: ILoggerConfig, correlationManager?: ICorrelationManager): ILogger {
         this.instance = this.createAdapter(config, correlationManager);
         return this.instance;
     }
@@ -28,15 +49,27 @@ export class StaticLoggerFactory {
     /**
      * Creates a logger instance based on the provided configuration settings.
      * @param config The configuration settings for the logger.
-     * @returns {ILogger} A logger instance.
+     * @param correlationManager The correlation manager for managing correlation IDs.
+     * @returns An instance of the {@link ILogger} interface.
      */
-    private static createAdapter(config: ILoggerConfig, correlationManager?: ICorrelationManager): ILogger {
+    protected createAdapter(config: ILoggerConfig, correlationManager?: ICorrelationManager): ILogger {
         switch (config.driver) {
             case 'winston':
                 return new WinstonAdapter(config, correlationManager);
 
             default:
-                throw new Error(`LoggerFactory: Unsupported logger driver: ${config.driver}`);
+                throw new Error(`${this.name}: Unsupported logger driver: ${config.driver}`);
         }
+    }
+
+    /* Getters & Setters */
+
+    public get instance(): ILogger {
+        if (!this._instance) throw new Error(`${this.name}: Logger instance not initialized.`);
+        return this._instance;
+    }
+
+    protected set instance(instance: ILogger) {
+        this._instance = instance;
     }
 }

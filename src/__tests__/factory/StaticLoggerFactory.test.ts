@@ -1,6 +1,6 @@
 import path from 'path';
 import { ILogger } from '../../ILogger';
-import { StaticLoggerFactory } from '../../factory/LoggerFactory';
+import { StaticLoggerFactory } from '../../factory/StaticLoggerFactory';
 import { defaultConfig } from '../config_files/testingConfigs';
 import { LoggerConfigurator } from '../../configurator/LoggerConfigurator';
 
@@ -55,13 +55,20 @@ describe('LoggerFactory', () => {
 
     // ------------------------------
 
-    it('Returns a singleton logger instance', () => {
+    it('Can return a singleton logger instance', () => {
         const loggerOne = StaticLoggerFactory.getLogger();
         const loggerTwo = StaticLoggerFactory.getLogger();
 
         expect(loggerOne).toBeDefined();
         expect(loggerTwo).toBeDefined();
         expect(loggerOne).toBe(loggerTwo);
+    });
+
+    // ------------------------------
+
+    it("Can return a prefixed logger instance", () => {
+        const logger = StaticLoggerFactory.getPrefixedLogger("TEST");
+        expect(logger).toBeDefined();
     });
 
 });

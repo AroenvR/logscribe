@@ -4,14 +4,15 @@ import { v4 as uuidv4 } from 'uuid';
 import { LoggerConfigurator } from "../configurator/LoggerConfigurator";
 import { CorrelationManager } from "../correlation/CorrelationManager";
 import { ICorrelationManager } from "../correlation/ICorrelationManager";
-import { StaticLoggerFactory } from "../factory/LoggerFactory";
 import { ILogger } from "../ILogger";
 import { TLoggerOptions } from "../ILoggerConfiguration";
 import { ILoggerConfigurator } from "../configurator/ILoggerConfigurator";
+import { StaticLoggerFactory } from "../factory/StaticLoggerFactory";
 
 describe("Integration test for logging", () => {
     const logDir = "./test_logs";
     const logFile = "Logging.log";
+
     const opts: TLoggerOptions = {
         loader: "object",
         config: {
@@ -51,7 +52,8 @@ describe("Integration test for logging", () => {
         jest.restoreAllMocks();
         jest.resetAllMocks();
 
-        if (fs.existsSync(logDir)) fs.rm(logDir, { recursive: true });
+        const filePath = `${logDir}/${logFile}`;
+        if (fs.existsSync(filePath)) fs.rmSync(filePath);
     });
 
     // ------------------------------
