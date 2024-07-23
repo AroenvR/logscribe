@@ -74,7 +74,7 @@ export interface ILoggerConfig {
  * If the loader is set to 'file', the path property is required.  
  * If the loader is set to 'object', the config property is required.  
  */
-export type TLoggerOptions = {
+export type TLoggerLoadOptions = {
     loader: 'file';
     path: string;
 } | {

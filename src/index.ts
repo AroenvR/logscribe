@@ -1,6 +1,6 @@
 // Types & Interfaces
 export { ILogger } from "./ILogger";
-export { ILoggerConfig, TLoggerOptions } from "./ILoggerConfiguration";
+export { ILoggerConfig, TLoggerLoadOptions as TLoggerOptions } from "./ILoggerConfiguration";
 export { ILoggerConfigurator } from "./configurator/ILoggerConfigurator";
 export { ICorrelationManager } from "./correlation/ICorrelationManager";
 

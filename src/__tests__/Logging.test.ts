@@ -5,7 +5,7 @@ import { LoggerConfigurator } from "../configurator/LoggerConfigurator";
 import { CorrelationManager } from "../correlation/CorrelationManager";
 import { ICorrelationManager } from "../correlation/ICorrelationManager";
 import { ILogger } from "../ILogger";
-import { TLoggerOptions } from "../ILoggerConfiguration";
+import { TLoggerLoadOptions } from "../ILoggerConfiguration";
 import { ILoggerConfigurator } from "../configurator/ILoggerConfigurator";
 import { StaticLoggerFactory } from "../factory/StaticLoggerFactory";
 
@@ -13,7 +13,7 @@ describe("Integration test for logging", () => {
     const logDir = "./test_logs";
     const logFile = "Logging.log";
 
-    const opts: TLoggerOptions = {
+    const opts: TLoggerLoadOptions = {
         loader: "object",
         config: {
             appName: 'IntegrationTest',
@@ -111,7 +111,7 @@ describe("Integration test for logging", () => {
     // ------------------------------
 
     test("Logs any message when whitelist isn't enabled", async () => {
-        const newOpts: TLoggerOptions = {
+        const newOpts: TLoggerLoadOptions = {
             loader: "object",
             config: {
                 appName: 'IntegrationTest',

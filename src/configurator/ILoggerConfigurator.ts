@@ -1,4 +1,4 @@
-import { ILoggerConfig, TLoggerOptions } from "../ILoggerConfiguration";
+import { ILoggerConfig, TLoggerLoadOptions } from "../ILoggerConfiguration";
 
 /**
  * Interface for the logger configurator.
@@ -6,7 +6,7 @@ import { ILoggerConfig, TLoggerOptions } from "../ILoggerConfiguration";
  * @property config The configuration settings for the logger.
  */
 export interface ILoggerConfigurator {
-    opts: TLoggerOptions | null;
+    opts: TLoggerLoadOptions | null;
     config: ILoggerConfig | null;
 
     /**
@@ -18,4 +18,10 @@ export interface ILoggerConfigurator {
      * If no options are provided, it will return the default configuration.
      */
     loadConfiguration(fallbackConfig?: ILoggerConfig): ILoggerConfig;
+
+    /**
+     * Validates the configuration settings using AJV.
+     * @param config The configuration settings to validate.
+     */
+    validateConfig(config: ILoggerConfig): boolean;
 }

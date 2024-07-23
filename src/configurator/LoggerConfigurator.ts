@@ -1,6 +1,9 @@
 import fs from 'fs-extra';
-import { ILoggerConfig, TLoggerOptions } from '../ILoggerConfiguration';
+import Ajv from "ajv"
+import addFormats from "ajv-formats"
+import { ILoggerConfig, TLoggerLoadOptions } from '../ILoggerConfiguration';
 import { ILoggerConfigurator } from './ILoggerConfigurator';
+import { loggerConfigSchema } from '../loggerConfigSchema';
 
 /**
  * Class responsible for loading and providing logger configuration settings.
@@ -8,10 +11,11 @@ import { ILoggerConfigurator } from './ILoggerConfigurator';
  */
 export class LoggerConfigurator implements ILoggerConfigurator {
   private readonly name = 'LoggerConfigurator';
-  private _opts: TLoggerOptions | null = null;
+  private _opts: TLoggerLoadOptions | null = null;
   private _config: ILoggerConfig | null = null;
+  private ajv = addFormats(new Ajv());
 
-  constructor(opts?: TLoggerOptions) {
+  constructor(opts?: TLoggerLoadOptions) {
     if (opts) this._opts = opts;
   }
 
@@ -63,12 +67,25 @@ export class LoggerConfigurator implements ILoggerConfigurator {
         break;
     }
 
+    this.validateConfig(this.config);
     return this.config;
   };
 
+  /**
+   * 
+   */
+  public validateConfig(config: ILoggerConfig): boolean {
+    const validate = this.ajv.compile(loggerConfigSchema);
+    const valid = validate(config);
+
+    if (!valid) console.error(`${this.name}: Configuration did not pass JSON Schema validation:`, validate.errors);
+
+    return valid;
+  }
+
   /* Getters & Setters */
 
-  public get opts(): TLoggerOptions | null {
+  public get opts(): TLoggerLoadOptions | null {
     return this._opts;
   }
 

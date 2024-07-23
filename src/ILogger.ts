@@ -11,8 +11,8 @@ export type TMetadata = Record<string, any> | Error | unknown;
 /**
  * ILogger interface defines the structure for logging mechanisms within the package.  
  * It provides methods for logging at various levels from detailed debug information to critical errors.
- * @property config The configuration settings for the logger.
- * @property correlationManager An optional correlation manager for managing correlation IDs in between async funtions.
+ * @property config The {@link ILoggerConfig} settings for the logger.
+ * @property correlationManager An optional {@link ICorrelationManager} for managing correlation IDs in between async funtions.
  */
 export interface ILogger {
     config: ILoggerConfig;
