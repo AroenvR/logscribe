@@ -45,8 +45,8 @@ export abstract class AbstractAdapter<T> implements ILogger {
 
     public log(message: string, metadata?: TMetadata): void {
         if (this.isWhitelistApproved(message)) {
-            // @ts-ignore
-            this.handle('normal', message, metadata); // log (log is often used by logging libraries)
+            // @ts-ignore (log is already used by Winston)
+            this.handle('normal', message, metadata);
         }
     }
 
@@ -96,30 +96,30 @@ export abstract class AbstractAdapter<T> implements ILogger {
      */
     private overwriteConsole(): void {
         if (this.config.level !== "verbose") {
-            console.debug = () => { };
-            console.log = () => { };
-            console.info = () => { };
-            console.warn = () => { };
-            console.error = () => { };
+            console.debug = () => undefined;
+            console.log = () => undefined;
+            console.info = () => undefined;
+            console.warn = () => undefined;
+            console.error = () => undefined;
         }
         else {
-            console.debug = (...args: any[]) => {
+            console.debug = (...args: unknown[]) => {
                 this.verbose(`console.debug ${args[0]}`, args[1]);
             }
 
-            console.log = (...args: any[]) => {
+            console.log = (...args: unknown[]) => {
                 this.verbose(`console.log ${args[0]}`, args[1]);
             }
 
-            console.info = (...args: any[]) => {
+            console.info = (...args: unknown[]) => {
                 this.verbose(`console.info ${args[0]}`, args[1]);
             }
 
-            console.warn = (...args: any[]) => {
+            console.warn = (...args: unknown[]) => {
                 this.verbose(`console.warn ${args[0]}`, args[1]);
             }
 
-            console.error = (...args: any[]) => {
+            console.error = (...args: unknown[]) => {
                 this.verbose(`console.error ${args[0]}`, args[1]);
             }
         }

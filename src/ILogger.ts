@@ -6,7 +6,7 @@ import { ICorrelationManager } from "./correlation/ICorrelationManager";
  * Type definition for metadata that can be attached to log messages.  
  * Can be a simple key-value record or an Error object for logging exceptions.
  */
-export type TMetadata = Record<string, any> | Error | unknown;
+export type TMetadata = Record<string, unknown> | Error | unknown;
 
 /**
  * ILogger interface defines the structure for logging mechanisms within the package.  

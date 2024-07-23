@@ -1,6 +1,6 @@
 import { WinstonAdapter } from "../adapters/WinstonAdapter";
 import { ICorrelationManager } from "../correlation/ICorrelationManager";
-import { ILogger } from "../ILogger";
+import { ILogger, TMetadata } from "../ILogger";
 import { ILoggerConfig } from "../ILoggerConfiguration";
 import { ILoggerFactory } from "./ILoggerFactory";
 
@@ -26,13 +26,13 @@ export class LoggerFactory implements ILoggerFactory {
         const prefixedLogger: ILogger = {
             config: this.instance.config,
             correlationManager: this.instance.correlationManager,
-            verbose: (message: string, metadata?: any) => this.instance.verbose(`${prefix}: ${message}`, metadata),
-            debug: (message: string, metadata?: any) => this.instance.debug(`${prefix}: ${message}`, metadata),
-            info: (message: string, metadata?: any) => this.instance.info(`${prefix}: ${message}`, metadata),
-            log: (message: string, metadata?: any) => this.instance.log(`${prefix}: ${message}`, metadata),
-            warn: (message: string, metadata?: any) => this.instance.warn(`${prefix}: ${message}`, metadata),
-            error: (message: string, metadata?: any) => this.instance.error(`${prefix}: ${message}`, metadata),
-            critical: (message: string, metadata?: any) => this.instance.critical(`${prefix}: ${message}`, metadata),
+            verbose: (message: string, metadata?: TMetadata) => this.instance.verbose(`${prefix}: ${message}`, metadata),
+            debug: (message: string, metadata?: TMetadata) => this.instance.debug(`${prefix}: ${message}`, metadata),
+            info: (message: string, metadata?: TMetadata) => this.instance.info(`${prefix}: ${message}`, metadata),
+            log: (message: string, metadata?: TMetadata) => this.instance.log(`${prefix}: ${message}`, metadata),
+            warn: (message: string, metadata?: TMetadata) => this.instance.warn(`${prefix}: ${message}`, metadata),
+            error: (message: string, metadata?: TMetadata) => this.instance.error(`${prefix}: ${message}`, metadata),
+            critical: (message: string, metadata?: TMetadata) => this.instance.critical(`${prefix}: ${message}`, metadata),
         };
 
         return prefixedLogger;

@@ -22,7 +22,7 @@ describe('LoggerFactory', () => {
 
     it('Creates a logger with the given configuration environment variable', () => {
         process.env.LOGSCRIBE_CONFIG = path.join(__dirname, '../', 'config_files', 'loggerConfig.json');
-        let configurator = new LoggerConfigurator();
+        const configurator = new LoggerConfigurator();
 
         const config = configurator.loadConfiguration();
         logger = StaticLoggerFactory.initialize(config);
@@ -34,7 +34,7 @@ describe('LoggerFactory', () => {
 
     it('Creates a logger with the given configuration file path', () => {
         const configPath = path.join(__dirname, '../', 'config_files', 'loggerConfig.json');
-        let configurator = new LoggerConfigurator({ loader: "file", path: configPath });
+        const configurator = new LoggerConfigurator({ loader: "file", path: configPath });
 
         const config = configurator.loadConfiguration();
         logger = StaticLoggerFactory.initialize(config);
@@ -45,7 +45,7 @@ describe('LoggerFactory', () => {
     // ------------------------------
 
     it('Creates a logger with the given configuration object', () => {
-        let configurator = new LoggerConfigurator({ loader: "object", config: defaultConfig });
+        const configurator = new LoggerConfigurator({ loader: "object", config: defaultConfig });
 
         const config = configurator.loadConfiguration();
         logger = StaticLoggerFactory.initialize(config);

@@ -1,4 +1,4 @@
-import { ILogger } from '../ILogger';
+import { ILogger, TMetadata } from '../ILogger';
 import { ILoggerConfig } from '../ILoggerConfiguration';
 import { WinstonAdapter } from '../adapters/WinstonAdapter';
 import { ICorrelationManager } from '../correlation/ICorrelationManager';
@@ -27,13 +27,13 @@ export class StaticLoggerFactory {
         const prefixedLogger: ILogger = {
             config: StaticLoggerFactory.instance.config,
             correlationManager: StaticLoggerFactory.instance.correlationManager,
-            verbose: (message: string, metadata?: any) => StaticLoggerFactory.instance.verbose(`${prefix}: ${message}`, metadata),
-            debug: (message: string, metadata?: any) => StaticLoggerFactory.instance.debug(`${prefix}: ${message}`, metadata),
-            info: (message: string, metadata?: any) => StaticLoggerFactory.instance.info(`${prefix}: ${message}`, metadata),
-            log: (message: string, metadata?: any) => StaticLoggerFactory.instance.log(`${prefix}: ${message}`, metadata),
-            warn: (message: string, metadata?: any) => StaticLoggerFactory.instance.warn(`${prefix}: ${message}`, metadata),
-            error: (message: string, metadata?: any) => StaticLoggerFactory.instance.error(`${prefix}: ${message}`, metadata),
-            critical: (message: string, metadata?: any) => StaticLoggerFactory.instance.critical(`${prefix}: ${message}`, metadata),
+            verbose: (message: string, metadata?: TMetadata) => StaticLoggerFactory.instance.verbose(`${prefix}: ${message}`, metadata),
+            debug: (message: string, metadata?: TMetadata) => StaticLoggerFactory.instance.debug(`${prefix}: ${message}`, metadata),
+            info: (message: string, metadata?: TMetadata) => StaticLoggerFactory.instance.info(`${prefix}: ${message}`, metadata),
+            log: (message: string, metadata?: TMetadata) => StaticLoggerFactory.instance.log(`${prefix}: ${message}`, metadata),
+            warn: (message: string, metadata?: TMetadata) => StaticLoggerFactory.instance.warn(`${prefix}: ${message}`, metadata),
+            error: (message: string, metadata?: TMetadata) => StaticLoggerFactory.instance.error(`${prefix}: ${message}`, metadata),
+            critical: (message: string, metadata?: TMetadata) => StaticLoggerFactory.instance.critical(`${prefix}: ${message}`, metadata),
         };
 
         return prefixedLogger;

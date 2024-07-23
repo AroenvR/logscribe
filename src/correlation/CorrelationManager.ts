@@ -18,7 +18,7 @@ export class CorrelationManager implements ICorrelationManager {
      */
     public runWithCorrelationId(correlationId: string, callback: () => unknown): void {
         this.asyncLocalStorage.run(correlationId, callback);
-    };
+    }
 
     /**
      * 

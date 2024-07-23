@@ -69,7 +69,7 @@ export class LoggerConfigurator implements ILoggerConfigurator {
 
     this.validateConfig(this.config);
     return this.config;
-  };
+  }
 
   /**
    * 
