@@ -1,28 +1,13 @@
 import { WinstonAdapter } from '../../adapters/WinstonAdapter';
 import { ILoggerConfig } from '../../ILoggerConfiguration';
 import { ILogger } from '../../ILogger';
-
-const defaultConfig: ILoggerConfig = {
-    appName: 'JestTest',
-    driver: 'winston',
-    enableCorrelation: false,
-    level: 'verbose',
-    console: true,
-    file: {
-        enabled: false,
-    },
-    http: {
-        enabled: false
-    },
-    useWhitelist: false,
-    prefixWhitelist: []
-}
+import { consoleConfig, defaultConfig } from '../config_files/testingConfigs';
 
 describe('WinstonAdapter', () => {
     let adapter: ILogger;
 
     beforeEach(() => {
-        adapter = new WinstonAdapter(defaultConfig);
+        adapter = new WinstonAdapter(consoleConfig);
     });
 
     afterEach(() => {
@@ -32,11 +17,7 @@ describe('WinstonAdapter', () => {
 
     // ------------------------------
 
-    // It can log with a correlation ID
-
-    // ------------------------------
-
-    it('Handles verbose messages correctly', () => {
+    test('Handles verbose messages correctly', () => {
         const spy = jest.spyOn(adapter, 'verbose').mockImplementation();
 
         const message = 'TEST: Verbose test message';
@@ -48,7 +29,7 @@ describe('WinstonAdapter', () => {
 
     // ------------------------------
 
-    it('Overwrites the console correctly', () => {
+    test('Overwrites the console correctly', () => {
         const spy = jest.spyOn(adapter, 'verbose').mockImplementation();
 
         const message = 'TEST: Verbose test message';
@@ -68,7 +49,7 @@ describe('WinstonAdapter', () => {
 
     // ------------------------------
 
-    it('Handles debug messages correctly', () => {
+    test('Handles debug messages correctly', () => {
         const spy = jest.spyOn(adapter, 'debug').mockImplementation();
 
         const message = 'TEST: Debug test message';
@@ -80,7 +61,7 @@ describe('WinstonAdapter', () => {
 
     // ------------------------------
 
-    it('Handles info messages correctly', () => {
+    test('Handles info messages correctly', () => {
         const spy = jest.spyOn(adapter, 'info').mockImplementation();
 
         const message = 'TEST: Info test message';
@@ -92,7 +73,7 @@ describe('WinstonAdapter', () => {
 
     // ------------------------------
 
-    it('Handles log messages correctly', () => {
+    test('Handles log messages correctly', () => {
         const spy = jest.spyOn(adapter, 'log').mockImplementation();
 
         const message = 'TEST: Log test message';
@@ -104,7 +85,7 @@ describe('WinstonAdapter', () => {
 
     // ------------------------------
 
-    it('Handles warn messages correctly', () => {
+    test('Handles warn messages correctly', () => {
         const spy = jest.spyOn(adapter, 'warn').mockImplementation();
 
         const message = 'TEST: Warn test message';
@@ -116,7 +97,7 @@ describe('WinstonAdapter', () => {
 
     // ------------------------------
 
-    it('Handles error messages correctly', () => {
+    test('Handles error messages correctly', () => {
         const spy = jest.spyOn(adapter, 'error').mockImplementation();
 
         const message = 'TEST: Error test message';
@@ -128,7 +109,7 @@ describe('WinstonAdapter', () => {
 
     // ------------------------------
 
-    it('Handles Errors correctly', () => {
+    test('Handles Errors correctly', () => {
         const spy = jest.spyOn(adapter, 'error').mockImplementation();
 
         try {
@@ -141,7 +122,7 @@ describe('WinstonAdapter', () => {
 
     // ------------------------------
 
-    it('Handles critical messages correctly', () => {
+    test('Handles critical messages correctly', () => {
         const spy = jest.spyOn(adapter, 'critical').mockImplementation();
 
         const message = 'TEST: Critical test message';
@@ -149,5 +130,26 @@ describe('WinstonAdapter', () => {
 
         adapter.critical(message, metadata);
         expect(spy).toHaveBeenCalledWith(message, metadata);
+    });
+
+    // ------------------------------
+
+    test("Throws when no logging logging transports are enabled", () => {
+        const loggerConfig: ILoggerConfig = {
+            appName: 'ThrowingTest',
+            driver: 'winston',
+            enableCorrelation: false,
+            level: 'verbose',
+            console: false,
+            file: {
+                enabled: false,
+            },
+            http: {
+                enabled: false
+            },
+            useWhitelist: false,
+            prefixWhitelist: []
+        };
+        expect(() => adapter = new WinstonAdapter(loggerConfig)).toThrow(`AbstractAdapter: No logging transports enabled.`);
     });
 });

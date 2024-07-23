@@ -61,7 +61,7 @@ export class WinstonAdapter extends AbstractAdapter<winston.Logger> {
      * @param message The message to output.
      * @param extra The extra data to include in the log entry.
      */
-    private formatMessage(level: string, message: string, extra: TMetadata) {
+    private formatMessage(level: string, message: string, extra: TMetadata): string {
         const now = new Date();
         const timestamp = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}.${now.getMilliseconds().toString().padStart(3, '0')}`;
 

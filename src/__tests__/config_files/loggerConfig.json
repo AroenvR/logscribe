@@ -1,5 +1,5 @@
 {
-    "appName": "JestTest",
+    "appName": "DefaultConfigTest",
     "driver": "winston",
     "enableCorrelation": false,
     "level": "verbose",

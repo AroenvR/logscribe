@@ -6,54 +6,29 @@ import { CorrelationManager } from "../correlation/CorrelationManager";
 import { ICorrelationManager } from "../correlation/ICorrelationManager";
 import { ILogger } from "../ILogger";
 import { TLoggerLoadOptions } from "../ILoggerConfiguration";
-import { ILoggerConfigurator } from "../configurator/ILoggerConfigurator";
-import { StaticLoggerFactory } from "../factory/StaticLoggerFactory";
+import { fileConfig, testLogDir, testLogFilename } from "./config_files/testingConfigs";
+import { ILoggerFactory } from "../factory/ILoggerFactory";
+import { LoggerFactory } from "../factory/LoggerFactory";
 
 describe("Integration test for logging", () => {
-    const logDir = "./test_logs";
-    const logFile = "Logging.log";
-
     const opts: TLoggerLoadOptions = {
         loader: "object",
-        config: {
-            appName: 'IntegrationTest',
-            driver: 'winston',
-            enableCorrelation: true,
-            level: 'verbose',
-            console: false,
-            file: {
-                enabled: true,
-                path: logDir,
-                name: logFile
-            },
-            http: {
-                enabled: false
-            },
-            useWhitelist: true,
-            prefixWhitelist: ["TEST", "console.log"]
-        }
+        config: fileConfig
     };
 
-    let configurator: ILoggerConfigurator;
     let correlationManager: ICorrelationManager;
 
+    let loggerFactory: ILoggerFactory;
     let logger: ILogger;
 
     beforeEach(() => {
-        configurator = new LoggerConfigurator(opts);
+        const config = new LoggerConfigurator(opts).loadConfiguration();
         correlationManager = new CorrelationManager();
 
-        const config = configurator.loadConfiguration();
-        StaticLoggerFactory.initialize(config, correlationManager);
-        logger = StaticLoggerFactory.getLogger();
-    });
+        loggerFactory = new LoggerFactory();
+        loggerFactory.initialize(config, correlationManager);
 
-    afterEach(() => {
-        jest.restoreAllMocks();
-        jest.resetAllMocks();
-
-        const filePath = `${logDir}/${logFile}`;
-        if (fs.existsSync(filePath)) fs.rmSync(filePath);
+        logger = loggerFactory.getLogger();
     });
 
     // ------------------------------
@@ -62,8 +37,8 @@ describe("Integration test for logging", () => {
         const msg = "FOO: This is a debug message with a non-whitelisted prefix.";
         logger.debug(msg);
 
-        const logFilePath = path.join(logDir, logFile);
-        expect(await fs.exists(logDir)).toBe(true);
+        const logFilePath = path.join(testLogDir, testLogFilename);
+        expect(await fs.exists(testLogDir)).toBe(true);
         expect(await fs.exists(logFilePath)).toBe(true);
 
         const logContent = await fs.readFile(logFilePath, "utf-8");
@@ -91,21 +66,21 @@ describe("Integration test for logging", () => {
             logger.critical("TEST: This is a critical message.");
         });
 
-        const logFilePath = path.join(logDir, logFile);
-        expect(await fs.exists(logDir)).toBe(true);
+        const logFilePath = path.join(testLogDir, testLogFilename);
+        expect(await fs.exists(testLogDir)).toBe(true);
         expect(await fs.exists(logFilePath)).toBe(true);
 
         const logContent = await fs.readFile(logFilePath, "utf-8");
 
-        expect(logContent).toContain(`IntegrationTest ${firstCorrelationId} VERBOSE - console.log This is a verbose message.`);
-        expect(logContent).toContain(`IntegrationTest ${firstCorrelationId} DEBUG - TEST: This is a debug message with data: {"foo":"bar"}`);
-        expect(logContent).toContain(`IntegrationTest ${firstCorrelationId} INFO - TEST: This is an info message.`);
+        expect(logContent).toContain(`FileTest ${firstCorrelationId} VERBOSE - console.log This is a verbose message.`);
+        expect(logContent).toContain(`FileTest ${firstCorrelationId} DEBUG - TEST: This is a debug message with data: {"foo":"bar"}`);
+        expect(logContent).toContain(`FileTest ${firstCorrelationId} INFO - TEST: This is an info message.`);
 
-        expect(logContent).toContain(`IntegrationTest ${secondCorrelationId} LOG - TEST: This is a log message.`);
-        expect(logContent).toContain(`IntegrationTest ${secondCorrelationId} WARN - TEST: This is a warn message.`);
+        expect(logContent).toContain(`FileTest ${secondCorrelationId} LOG - TEST: This is a log message.`);
+        expect(logContent).toContain(`FileTest ${secondCorrelationId} WARN - TEST: This is a warn message.`);
 
-        expect(logContent).toContain(`IntegrationTest ${firstCorrelationId} ERROR - TEST: This is an error message. Error: Foo: bar!`);
-        expect(logContent).toContain(`IntegrationTest ${firstCorrelationId} CRITICAL - TEST: This is a critical message.`);
+        expect(logContent).toContain(`FileTest ${firstCorrelationId} ERROR - TEST: This is an error message. Error: Foo: bar!`);
+        expect(logContent).toContain(`FileTest ${firstCorrelationId} CRITICAL - TEST: This is a critical message.`);
     });
 
     // ------------------------------
@@ -121,8 +96,8 @@ describe("Integration test for logging", () => {
                 console: false,
                 file: {
                     enabled: true,
-                    path: logDir,
-                    name: logFile
+                    path: testLogDir,
+                    name: testLogFilename
                 },
                 http: {
                     enabled: false
@@ -132,17 +107,16 @@ describe("Integration test for logging", () => {
             }
         };
 
-        configurator = new LoggerConfigurator(newOpts);
-        const config = configurator.loadConfiguration();
+        const config = new LoggerConfigurator(newOpts).loadConfiguration();
 
-        StaticLoggerFactory.initialize(config, correlationManager);
-        logger = StaticLoggerFactory.getLogger();
+        loggerFactory.initialize(config, correlationManager);
+        logger = loggerFactory.getLogger();
 
         const msg = "BAR: This is a debug message with a non-whitelisted prefix.";
         logger.debug(msg);
 
-        const logFilePath = path.join(logDir, logFile);
-        expect(await fs.exists(logDir)).toBe(true);
+        const logFilePath = path.join(testLogDir, testLogFilename);
+        expect(await fs.exists(testLogDir)).toBe(true);
         expect(await fs.exists(logFilePath)).toBe(true);
 
         const logContent = await fs.readFile(logFilePath, "utf-8");

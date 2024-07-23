@@ -4,6 +4,7 @@ import addFormats from "ajv-formats"
 import { ILoggerConfig, TLoggerLoadOptions } from '../ILoggerConfiguration';
 import { ILoggerConfigurator } from './ILoggerConfigurator';
 import { loggerConfigSchema } from '../loggerConfigSchema';
+import { defaultConfiguration } from '../defaultConfiguration';
 
 /**
  * Class responsible for loading and providing logger configuration settings.
@@ -24,21 +25,7 @@ export class LoggerConfigurator implements ILoggerConfigurator {
    */
   public loadConfiguration(fallbackConfig?: ILoggerConfig): ILoggerConfig {
     // Set a fallback configuration failsafe.
-    if (!fallbackConfig) fallbackConfig = {
-      appName: 'UNKNOWN-SET_TO_DEFAULT_CONFIG',
-      driver: 'winston',
-      enableCorrelation: false,
-      level: 'critical',
-      console: false,
-      file: {
-        enabled: false,
-      },
-      http: {
-        enabled: false,
-      },
-      useWhitelist: false,
-      prefixWhitelist: [],
-    };
+    if (!fallbackConfig) fallbackConfig = defaultConfiguration;
 
     // If the environment variable LOGSCRIBE_CONFIG is set, load the configuration from the specified file.
     if (process.env.LOGSCRIBE_CONFIG) {
@@ -78,7 +65,7 @@ export class LoggerConfigurator implements ILoggerConfigurator {
     const validate = this.ajv.compile(loggerConfigSchema);
     const valid = validate(config);
 
-    if (!valid) console.error(`${this.name}: Configuration did not pass JSON Schema validation:`, validate.errors);
+    if (!valid) throw new Error(`${this.name}: Configuration did not pass JSON Schema validation: ${JSON.stringify(validate.errors)}`);
 
     return valid;
   }

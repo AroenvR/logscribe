@@ -15,6 +15,8 @@ export abstract class AbstractAdapter<T> implements ILogger {
 
     constructor(config: ILoggerConfig, correlationManager?: ICorrelationManager) {
         this._config = config;
+        if (!this.config.console && !this.config.file.enabled && !this.config.http.enabled) throw new Error(`${this.name}: No logging transports enabled.`);
+
         if (correlationManager) this._correlationManager = correlationManager;
 
         // If the environment variable TAIL_TESTING is set to 'true', the log file is written to the logs directory in the project root as tail.test.log.
