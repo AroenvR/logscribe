@@ -1,8 +1,9 @@
 {
     "name": "ts-log-adapter",
-    "version": "1.0.2",
+    "version": "1.0.11",
     "description": "An abstract logger for advanced monitoring.",
-    "main": "index.ts",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
     "scripts": {
         "start": "echo \"Nothing to start!\"",
         "test": "npm run lint; jest",
