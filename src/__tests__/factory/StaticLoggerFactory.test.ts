@@ -5,71 +5,69 @@ import { defaultConfig } from '../config_files/testingConfigs';
 import { LoggerConfigurator } from '../../configurator/LoggerConfigurator';
 
 describe('LoggerFactory', () => {
-    let logger: ILogger;
+	let logger: ILogger;
 
-    afterEach(() => {
-        jest.restoreAllMocks();
-        jest.resetAllMocks();
-    });
+	afterEach(() => {
+		jest.restoreAllMocks();
+		jest.resetAllMocks();
+	});
 
-    // ------------------------------
+	// ------------------------------
 
-    it("Throws an error if no settings are found", () => {
-        expect(() => StaticLoggerFactory.getLogger()).toThrowError('LoggerFactory: Logger instance not initialized.');
-    });
+	it('Throws an error if no settings are found', () => {
+		expect(() => StaticLoggerFactory.getLogger()).toThrowError('LoggerFactory: Logger instance not initialized.');
+	});
 
-    // ------------------------------
+	// ------------------------------
 
-    it('Creates a logger with the given configuration environment variable', () => {
-        process.env.LOGSCRIBE_CONFIG = path.join(__dirname, '../', 'config_files', 'loggerConfig.json');
-        const configurator = new LoggerConfigurator();
+	it('Creates a logger with the given configuration environment variable', () => {
+		process.env.LOGSCRIBE_CONFIG = path.join(__dirname, '../', 'config_files', 'loggerConfig.json');
+		const configurator = new LoggerConfigurator();
 
-        const config = configurator.loadConfiguration();
-        logger = StaticLoggerFactory.initialize(config);
+		const config = configurator.loadConfiguration();
+		logger = StaticLoggerFactory.initialize(config);
 
-        expect(logger.config).toEqual(defaultConfig);
-    });
+		expect(logger.config).toEqual(defaultConfig);
+	});
 
-    // ------------------------------
+	// ------------------------------
 
-    it('Creates a logger with the given configuration file path', () => {
-        const configPath = path.join(__dirname, '../', 'config_files', 'loggerConfig.json');
-        const configurator = new LoggerConfigurator({ loader: "file", path: configPath });
+	it('Creates a logger with the given configuration file path', () => {
+		const configPath = path.join(__dirname, '../', 'config_files', 'loggerConfig.json');
+		const configurator = new LoggerConfigurator({ loader: 'file', path: configPath });
 
-        const config = configurator.loadConfiguration();
-        logger = StaticLoggerFactory.initialize(config);
+		const config = configurator.loadConfiguration();
+		logger = StaticLoggerFactory.initialize(config);
 
-        expect(logger.config).toEqual(defaultConfig);
-    });
+		expect(logger.config).toEqual(defaultConfig);
+	});
 
-    // ------------------------------
+	// ------------------------------
 
-    it('Creates a logger with the given configuration object', () => {
-        const configurator = new LoggerConfigurator({ loader: "object", config: defaultConfig });
+	it('Creates a logger with the given configuration object', () => {
+		const configurator = new LoggerConfigurator({ loader: 'object', config: defaultConfig });
 
-        const config = configurator.loadConfiguration();
-        logger = StaticLoggerFactory.initialize(config);
+		const config = configurator.loadConfiguration();
+		logger = StaticLoggerFactory.initialize(config);
 
-        expect(logger.config).toEqual(defaultConfig);
-    });
+		expect(logger.config).toEqual(defaultConfig);
+	});
 
-    // ------------------------------
+	// ------------------------------
 
-    it('Can return a singleton logger instance', () => {
-        const loggerOne = StaticLoggerFactory.getLogger();
-        const loggerTwo = StaticLoggerFactory.getLogger();
+	it('Can return a singleton logger instance', () => {
+		const loggerOne = StaticLoggerFactory.getLogger();
+		const loggerTwo = StaticLoggerFactory.getLogger();
 
-        expect(loggerOne).toBeDefined();
-        expect(loggerTwo).toBeDefined();
-        expect(loggerOne).toBe(loggerTwo);
-    });
+		expect(loggerOne).toBeDefined();
+		expect(loggerTwo).toBeDefined();
+		expect(loggerOne).toBe(loggerTwo);
+	});
 
-    // ------------------------------
+	// ------------------------------
 
-    it("Can return a prefixed logger instance", () => {
-        const logger = StaticLoggerFactory.getPrefixedLogger("TEST");
-        expect(logger).toBeDefined();
-    });
-
+	it('Can return a prefixed logger instance', () => {
+		const logger = StaticLoggerFactory.getPrefixedLogger('TEST');
+		expect(logger).toBeDefined();
+	});
 });
-

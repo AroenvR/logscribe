@@ -9,6 +9,7 @@
         "test:watch": "npm run lint; jest --watchAll --runInBand",
         "test:coverage": "jest --coverage",
         "lint": "eslint 'src/**/*.{ts,tsx}'",
+        "format": "prettier --write \"src/**/*.ts\" \"src/__tests__/**/*.ts\"",
         "build": "tsc"
     },
     "keywords": [],

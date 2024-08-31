@@ -6,24 +6,24 @@ import { ICorrelationManager } from './ICorrelationManager';
  * @implements The {@link ICorrelationManager} interface.
  */
 export class CorrelationManager implements ICorrelationManager {
-    private asyncLocalStorage: AsyncLocalStorage<string>;
+	private asyncLocalStorage: AsyncLocalStorage<string>;
 
-    constructor(asyncLocalStorage?: AsyncLocalStorage<string>) {
-        if (asyncLocalStorage) this.asyncLocalStorage = asyncLocalStorage;
-        else this.asyncLocalStorage = new AsyncLocalStorage();
-    }
+	constructor(asyncLocalStorage?: AsyncLocalStorage<string>) {
+		if (asyncLocalStorage) this.asyncLocalStorage = asyncLocalStorage;
+		else this.asyncLocalStorage = new AsyncLocalStorage();
+	}
 
-    /**
-     * 
-     */
-    public runWithCorrelationId(correlationId: string, callback: () => unknown): void {
-        this.asyncLocalStorage.run(correlationId, callback);
-    }
+	/**
+	 *
+	 */
+	public runWithCorrelationId(correlationId: string, callback: () => unknown): void {
+		this.asyncLocalStorage.run(correlationId, callback);
+	}
 
-    /**
-     * 
-     */
-    public getCorrelationId(): string | undefined {
-        return this.asyncLocalStorage.getStore();
-    }
+	/**
+	 *
+	 */
+	public getCorrelationId(): string | undefined {
+		return this.asyncLocalStorage.getStore();
+	}
 }
