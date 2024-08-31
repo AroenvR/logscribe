@@ -34,15 +34,17 @@ export abstract class AbstractAdapter<T> implements ILogger {
     }
 
     public verbose(message: string, metadata?: TMetadata): void {
-        if (this.isWhitelistApproved(message)) this.handle('verbose', message, metadata);
+        this.handle('verbose', message, metadata);
     }
 
     public debug(message: string, metadata?: TMetadata): void {
         if (this.isWhitelistApproved(message)) this.handle('debug', message, metadata);
+        else this.handle('verbose', `Unwhitelisted message: ${message}`);
     }
 
     public info(message: string, metadata?: TMetadata): void {
         if (this.isWhitelistApproved(message)) this.handle('info', message, metadata);
+        else this.handle('verbose', `Unwhitelisted message: ${message}`);
     }
 
     public log(message: string, metadata?: TMetadata): void {
@@ -50,18 +52,22 @@ export abstract class AbstractAdapter<T> implements ILogger {
             // @ts-ignore (log is already used by Winston)
             this.handle('normal', message, metadata);
         }
+        else this.handle('verbose', `Unwhitelisted message: ${message}`);
     }
 
     public warn(message: string, metadata?: TMetadata): void {
         if (this.isWhitelistApproved(message)) this.handle('warn', message, metadata);
+        else this.handle('verbose', `Unwhitelisted message: ${message}`);
     }
 
     public error(message: string, metadata?: TMetadata): void {
         if (this.isWhitelistApproved(message)) this.handle('error', message, metadata);
+        else this.handle('verbose', `Unwhitelisted message: ${message}`);
     }
 
     public critical(message: string, metadata?: TMetadata): void {
         if (this.isWhitelistApproved(message)) this.handle('critical', message, metadata);
+        else this.handle('verbose', `Unwhitelisted message: ${message}`);
     }
 
     /**
