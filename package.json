@@ -1,6 +1,6 @@
 {
     "name": "ts-log-adapter",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "An abstract logger for advanced monitoring.",
     "main": "index.ts",
     "scripts": {
@@ -22,7 +22,6 @@
         "dotenv": "^16.0.3",
         "fix": "^0.0.3",
         "fs-extra": "^11.2.0",
-        "prettier": "^3.3.3",
         "ts-istruthy": "^1.0.2",
         "ts-node": "^10.9.1",
         "uuid": "^9.0.1",
@@ -38,6 +37,7 @@
         "eslint-plugin-react": "^7.32.2",
         "jest": "^29.6.2",
         "nodemon": "^3.1.4",
+        "prettier": "^3.3.3",
         "ts-jest": "^29.1.1",
         "typescript": "^5.0.4"
     }
