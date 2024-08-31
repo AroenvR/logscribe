@@ -1,6 +1,6 @@
 {
-    "name": "logscribe",
-    "version": "1.0.0",
+    "name": "ts-log-adapter",
+    "version": "1.0.1",
     "description": "An abstract logger for advanced monitoring.",
     "main": "index.ts",
     "scripts": {
